@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    url: jdbc:mysql://localhost:3307/fastsns-db/serverTimezone=Asia/Seoul
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
