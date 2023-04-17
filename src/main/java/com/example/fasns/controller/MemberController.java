@@ -1,23 +1,26 @@
 package com.example.fasns.controller;
 
+import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.dto.MemberRegisterCommand;
-import com.example.fasns.domain.member.entity.Member;
+import com.example.fasns.domain.member.service.MemberReadService;
 import com.example.fasns.domain.member.service.MemberWriteService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 public class MemberController {
 
     private final MemberWriteService memberWriteService;
-
-    public MemberController(MemberWriteService memberWriteService) {
-        this.memberWriteService = memberWriteService;
-    }
+    private final MemberReadService memberReadService;
 
     @PostMapping("/members")
-    public Member register(@RequestBody MemberRegisterCommand command) {
-        return memberWriteService.create(command);
+    public MemberDto register(@RequestBody MemberRegisterCommand command) {
+        return memberWriteService.register(command);
+    }
+
+    @GetMapping("/members/{id}")
+    public MemberDto getMember(@PathVariable Long id) {
+        return memberReadService.getMember(id);
     }
 }

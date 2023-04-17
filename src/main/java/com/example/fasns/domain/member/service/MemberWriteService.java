@@ -1,5 +1,6 @@
 package com.example.fasns.domain.member.service;
 
+import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.dto.MemberRegisterCommand;
 import com.example.fasns.domain.member.entity.Member;
 import com.example.fasns.domain.member.repository.MemberRepository;
@@ -16,7 +17,7 @@ public class MemberWriteService {
      * 회원정보등록(이메일, 닉네임, 생년월일)
      * param - memberRegisterCommand
      */
-    public Member create(MemberRegisterCommand command) {
+    public MemberDto register(MemberRegisterCommand command) {
         Member member = Member.builder()
                 .email(command.getEmail())
                 .nickname(command.getNickname())
