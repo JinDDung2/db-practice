@@ -12,6 +12,6 @@ public class MemberReadService {
     private final MemberRepository memberRepository;
 
     public MemberDto getMember(Long id) {
-        return memberRepository.findById(id).orElseThrow();
+        return MemberDto.toDto(memberRepository.findById(id).orElseThrow());
     }
 }

@@ -1,6 +1,5 @@
 package com.example.fasns.domain.member.repository;
 
-import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
@@ -24,7 +23,7 @@ public class MemberRepository {
 
     private static final String TABLE = "Member";
 
-    public Optional<MemberDto> findById(Long id) {
+    public Optional<Member> findById(Long id) {
         String sql = String.format("select * from %s where id = :id", TABLE);
         MapSqlParameterSource param = new MapSqlParameterSource()
                 .addValue("id", id);
@@ -38,14 +37,14 @@ public class MemberRepository {
                 .build();
 
         Member member = namedParameterJdbcTemplate.queryForObject(sql, param, rowMapper);
-        return Optional.ofNullable(MemberDto.toDto(member));
+        return Optional.ofNullable(member);
     }
 
-    public MemberDto save(Member member) {
+    public Member save(Member member) {
         if (member.getId() == null) {
-            return MemberDto.toDto(insert(member));
+            return insert(member);
         }
-        return MemberDto.toDto(update(member));
+        return update(member);
     }
 
     private Member insert(Member member) {
