@@ -1,10 +1,12 @@
 package com.example.fasns.domain.member.entity;
 
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Getter
 public class MemberNicknameHistory {
     private final Long id;
 
