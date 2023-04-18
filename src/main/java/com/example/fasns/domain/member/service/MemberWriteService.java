@@ -1,5 +1,6 @@
 package com.example.fasns.domain.member.service;
 
+import com.example.fasns.domain.exception.NotFoundException;
 import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.dto.MemberRegisterCommand;
 import com.example.fasns.domain.member.entity.Member;
@@ -24,6 +25,13 @@ public class MemberWriteService {
                 .birth(command.getBirth())
                 .build();
 
-        return memberRepository.save(member);
+        return MemberDto.toDto(memberRepository.save(member));
+    }
+
+    public void changeNickname(Long memberId, String nickname) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException());
+        member.changeNickname(nickname);
+        memberRepository.save(member);
+        // TODO: 2023/04/18 변경내역 히스토리 저장하기
     }
 }

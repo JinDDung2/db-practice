@@ -65,7 +65,9 @@ public class MemberRepository {
     }
 
     private Member update(Member member) {
-        // TODO: 2023/04/17 implemented
+        String sql = String.format("UPDATE %s set email = :email, nickname = :nickname, birth = :birth WHERE id = :id", TABLE);
+        SqlParameterSource params = new BeanPropertySqlParameterSource(member);
+        namedParameterJdbcTemplate.update(sql, params);
         return member;
     }
 }
