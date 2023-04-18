@@ -1,6 +1,7 @@
 package com.example.fasns.domain.member.dto;
 
 import com.example.fasns.domain.member.entity.MemberNicknameHistory;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ public class MemberNicknameHistoryDto {
     private Long id;
     private Long memberId;
     private String nickname;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 
     @Builder
