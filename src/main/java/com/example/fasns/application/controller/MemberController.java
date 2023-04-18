@@ -1,4 +1,4 @@
-package com.example.fasns.controller;
+package com.example.fasns.application.controller;
 
 import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.dto.MemberNicknameHistoryDto;

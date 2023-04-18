@@ -9,9 +9,6 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.Collections;
-import java.util.List;
-
 @Configuration
 public class SwaggerConfig {
     @Bean
@@ -21,7 +18,7 @@ public class SwaggerConfig {
 //                .securityContexts(Collections.singletonList(securityContext()))
 //                .securitySchemes(List.of(apiKey()))
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.example.fasns.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.example.fasns.application.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
