@@ -1,4 +1,4 @@
-package com.example.fasns.domain.member.util;
+package com.example.fasns.util;
 
 import com.example.fasns.domain.member.entity.Member;
 import org.jeasy.random.EasyRandom;

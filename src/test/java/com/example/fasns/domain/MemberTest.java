@@ -1,6 +1,7 @@
-package com.example.fasns.domain.member.entity;
+package com.example.fasns.domain;
 
-import com.example.fasns.domain.member.util.MemberFixtureFactory;
+import com.example.fasns.domain.member.entity.Member;
+import com.example.fasns.util.MemberFixtureFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
