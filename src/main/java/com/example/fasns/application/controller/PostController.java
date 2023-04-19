@@ -1,12 +1,15 @@
 package com.example.fasns.application.controller;
 
+import com.example.fasns.domain.post.dto.DailyPostCountDto;
+import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.dto.PostCommand;
 import com.example.fasns.domain.post.dto.PostDto;
+import com.example.fasns.domain.post.service.PostReadService;
 import com.example.fasns.domain.post.service.PostWriteService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -14,9 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
     private final PostWriteService postWriteService;
+    private final PostReadService postReadService;
 
     @PostMapping
-    public PostDto create(PostCommand command) {
+    public PostDto create(@RequestBody PostCommand command) {
         return postWriteService.create(command);
+    }
+
+    @GetMapping("/daily-post-counts")
+    public List<DailyPostCountDto> getDailyPostCount(DailyPostCountRequest request) {
+        return postReadService.getDailyPostCount(request);
     }
 }
