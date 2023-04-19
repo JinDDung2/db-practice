@@ -1,4 +1,4 @@
-package com.example.fasns.domain;
+package com.example.fasns.domain.member;
 
 import com.example.fasns.domain.member.entity.Member;
 import com.example.fasns.util.MemberFixtureFactory;

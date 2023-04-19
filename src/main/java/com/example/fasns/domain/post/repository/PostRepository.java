@@ -44,6 +44,16 @@ public class PostRepository {
         return update(post);
     }
 
+    public void bulkInsert(List<Post> posts) {
+        String sql = String.format("INSERT INTO %s (memberId, title, contents, createdDate, createdAt) \n" +
+                "VALUES (:memberId, :title, :contents, :createdDate, :createdAt)", TABLE);
+
+        SqlParameterSource[] params = posts.stream()
+                .map(BeanPropertySqlParameterSource::new)
+                .toArray(SqlParameterSource[]::new);
+        namedParameterJdbcTemplate.batchUpdate(sql, params);
+    }
+
     private Post insert(Post post) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(namedParameterJdbcTemplate.getJdbcTemplate())
                 .withTableName(TABLE)
