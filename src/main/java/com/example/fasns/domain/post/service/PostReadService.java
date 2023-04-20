@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import utils.CursorRequest;
+import utils.PageCursor;
 
 import java.util.List;
 
@@ -29,6 +31,28 @@ public class PostReadService {
 
     public Page<Post> getPosts(Long memberId, Pageable pageable) {
         return postRepository.findAllByMemberId(memberId, pageable);
+    }
+
+    public PageCursor<Post> getPosts(Long memberId, CursorRequest request) {
+        /*
+        SELECT *
+        FROM POST
+        WHERE memberId = :memberId and id > key // 단 key IS NULL 경우도 생각(맨처음)
+         */
+        List<Post> posts = findAll(memberId, request);
+        long nextKey = posts.stream()
+                .mapToLong(Post::getId).min()
+                .orElse(CursorRequest.NONE_KEY);
+
+        return new PageCursor<>(request.next(nextKey), posts);
+    }
+
+    private List<Post> findAll(Long memberId, CursorRequest request) {
+        if (request.hasKey()) {
+            return postRepository.findAllByLessThanIdAndMemberIdAndOrderByIdDesc(request.getKey(), memberId, request.getSize());
+        }
+
+        return postRepository.findAllByMemberIdAndOrderByIdDesc(memberId, request.getSize());
     }
 
 }

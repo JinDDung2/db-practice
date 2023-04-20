@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import utils.CursorRequest;
+import utils.PageCursor;
 
 import java.util.List;
 
@@ -33,7 +35,12 @@ public class PostController {
     }
 
     @GetMapping("/members/{memberId}")
-    public Page<Post> getPosts(@RequestParam Long memberId, Pageable pageable) {
+    public Page<Post> getPosts(@PathVariable Long memberId, Pageable pageable) {
         return postReadService.getPosts(memberId, pageable);
+    }
+
+    @GetMapping("/members/{memberId}/cusror")
+    public PageCursor<Post> getPostsByCursor(@PathVariable Long memberId, CursorRequest cursorRequest) {
+        return postReadService.getPosts(memberId, cursorRequest);
     }
 }

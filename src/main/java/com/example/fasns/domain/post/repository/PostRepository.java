@@ -1,6 +1,5 @@
 package com.example.fasns.domain.post.repository;
 
-import utils.PageHelper;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.entity.Post;
@@ -15,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import utils.PageHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -79,6 +79,35 @@ public class PostRepository {
         SqlParameterSource params = new MapSqlParameterSource().addValue("memberId", memberId);
 
         return namedParameterJdbcTemplate.queryForObject(sql, params, Long.class);
+    }
+
+    public List<Post> findAllByMemberIdAndOrderByIdDesc(Long memberId, int size) {
+        String sql = String.format("SELECT * \n" +
+                "FROM %s \n" +
+                "WHERE memberId = :memberId \n" +
+                "ORDER BY id desc \n" +
+                "LIMIT :size", TABLE);
+
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("memberId", memberId)
+                .addValue("size", size);
+
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
+    public List<Post> findAllByLessThanIdAndMemberIdAndOrderByIdDesc(Long id, Long memberId, int size) {
+        String sql = String.format("SELECT * \n" +
+                "FROM %s \n" +
+                "WHERE memberId = :memberId AND id < :id \n" +
+                "ORDER BY id desc \n" +
+                "LIMIT :size", TABLE);
+
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", id)
+                .addValue("memberId", memberId)
+                .addValue("size", size);
+
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
     }
 
     public Post save(Post post) {
