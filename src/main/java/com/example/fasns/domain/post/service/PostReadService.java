@@ -40,19 +40,43 @@ public class PostReadService {
         WHERE memberId = :memberId and id > key // 단 key IS NULL 경우도 생각(맨처음)
          */
         List<Post> posts = findAll(memberId, request);
-        long nextKey = posts.stream()
-                .mapToLong(Post::getId).min()
-                .orElse(CursorRequest.NONE_KEY);
+        long nextKey = getNextKey(posts);
 
         return new PageCursor<>(request.next(nextKey), posts);
     }
 
+    public PageCursor<Post> getPosts(List<Long> memberIds, CursorRequest request) {
+        /*
+        SELECT *
+        FROM POST
+        WHERE memberId = :memberId and id > key // 단 key IS NULL 경우도 생각(맨처음)
+         */
+        List<Post> posts = findAll(memberIds , request);
+        long nextKey = getNextKey(posts);
+
+        return new PageCursor<>(request.next(nextKey), posts);
+    }
+
+    private long getNextKey(List<Post> posts) {
+        return posts.stream()
+                .mapToLong(Post::getId).min()
+                .orElse(CursorRequest.NONE_KEY);
+    }
+
     private List<Post> findAll(Long memberId, CursorRequest request) {
         if (request.hasKey()) {
-            return postRepository.findAllByLessThanIdAndMemberIdAndOrderByIdDesc(request.getKey(), memberId, request.getSize());
+            return postRepository.findAllByLessThanIdAndMemberIdInAndOrderByIdDesc(request.getKey(), memberId, request.getSize());
         }
 
-        return postRepository.findAllByMemberIdAndOrderByIdDesc(memberId, request.getSize());
+        return postRepository.findAllByMemberIdInAndOrderByIdDesc(memberId, request.getSize());
+    }
+
+    private List<Post> findAll(List<Long> memberIds, CursorRequest request) {
+        if (request.hasKey()) {
+            return postRepository.findAllByLessThanIdAndMemberIdInAndOrderByIdDesc(request.getKey(), memberIds, request.getSize());
+        }
+
+        return postRepository.findAllByMemberIdInAndOrderByIdDesc(memberIds, request.getSize());
     }
 
 }

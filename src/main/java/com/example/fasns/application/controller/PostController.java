@@ -1,5 +1,6 @@
 package com.example.fasns.application.controller;
 
+import com.example.fasns.application.usecase.GetTimelinePostUseCase;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.dto.PostCommand;
@@ -23,6 +24,7 @@ public class PostController {
 
     private final PostWriteService postWriteService;
     private final PostReadService postReadService;
+    private final GetTimelinePostUseCase getTimelinePostUseCase;
 
     @PostMapping
     public PostDto create(@RequestBody PostCommand command) {
@@ -42,5 +44,10 @@ public class PostController {
     @GetMapping("/members/{memberId}/cusror")
     public PageCursor<Post> getPostsByCursor(@PathVariable Long memberId, CursorRequest cursorRequest) {
         return postReadService.getPosts(memberId, cursorRequest);
+    }
+
+    @GetMapping("/members/{memberId}/timeline")
+    public PageCursor<Post> getTimeline(@PathVariable Long memberId, CursorRequest cursorRequest) {
+        return getTimelinePostUseCase.execute(memberId, cursorRequest);
     }
 }

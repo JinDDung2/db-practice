@@ -81,7 +81,7 @@ public class PostRepository {
         return namedParameterJdbcTemplate.queryForObject(sql, params, Long.class);
     }
 
-    public List<Post> findAllByMemberIdAndOrderByIdDesc(Long memberId, int size) {
+    public List<Post> findAllByMemberIdInAndOrderByIdDesc(Long memberId, int size) {
         String sql = String.format("SELECT * \n" +
                 "FROM %s \n" +
                 "WHERE memberId = :memberId \n" +
@@ -95,7 +95,25 @@ public class PostRepository {
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
     }
 
-    public List<Post> findAllByLessThanIdAndMemberIdAndOrderByIdDesc(Long id, Long memberId, int size) {
+    public List<Post> findAllByMemberIdInAndOrderByIdDesc(List<Long> memberIds, int size) {
+        if(memberIds.isEmpty()) {
+            return List.of();
+        }
+
+        String sql = String.format("SELECT * \n" +
+                "FROM %s \n" +
+                "WHERE memberId in (:memberIds) \n" +
+                "ORDER BY id desc \n" +
+                "LIMIT :size", TABLE);
+
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("memberIds", memberIds)
+                .addValue("size", size);
+
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
+    public List<Post> findAllByLessThanIdAndMemberIdInAndOrderByIdDesc(Long id, Long memberId, int size) {
         String sql = String.format("SELECT * \n" +
                 "FROM %s \n" +
                 "WHERE memberId = :memberId AND id < :id \n" +
@@ -105,6 +123,24 @@ public class PostRepository {
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", id)
                 .addValue("memberId", memberId)
+                .addValue("size", size);
+
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
+    public List<Post> findAllByLessThanIdAndMemberIdInAndOrderByIdDesc(Long id, List<Long> memberIds, int size) {
+        if (memberIds.isEmpty()) {
+            return List.of();
+        }
+        String sql = String.format("SELECT * \n" +
+                "FROM %s \n" +
+                "WHERE memberId in (:memberIds) AND id < :id \n" +
+                "ORDER BY id desc \n" +
+                "LIMIT :size", TABLE);
+
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", id)
+                .addValue("memberIds", memberIds)
                 .addValue("size", size);
 
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
