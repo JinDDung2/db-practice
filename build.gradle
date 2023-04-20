@@ -21,9 +21,10 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.data:spring-data-commons'
 
     implementation "io.springfox:springfox-boot-starter:3.0.0"
-    implementation "io.springfox:springfox-swagger-ui:3.0.0"
+    implementation 'org.springdoc:springdoc-openapi-ui'
 
     // https://mvnrepository.com/artifact/org.jeasy/easy-random-core
     testImplementation 'org.jeasy:easy-random-core:5.0.0'
