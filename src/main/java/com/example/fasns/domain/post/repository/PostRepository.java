@@ -56,8 +56,12 @@ public class PostRepository {
         return namedParameterJdbcTemplate.query(sql, params, DAILY_POST_COUNT_DTO_ROW_MAPPER);
     }
 
-    public Optional<Post> findById(Long postId) {
+    public Optional<Post> findById(Long postId, boolean requiredLock) {
         String sql = String.format("SELECT * FROM %s WHERE id = :postId", TABLE);
+        if (requiredLock) {
+            sql += " FOR UPDATE";
+            System.out.println("sql = " + sql);
+        }
 
         SqlParameterSource params = new MapSqlParameterSource().addValue("postId", postId);
 

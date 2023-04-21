@@ -6,6 +6,7 @@ import com.example.fasns.domain.post.entity.Post;
 import com.example.fasns.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.fasns.common.ErrorCode.POST_NOT_FOUND;
 
@@ -30,8 +31,9 @@ public class PostWriteService {
      * 2. 연산이 일어나고 (=변경하고)
      * 3. 저장한다.
      */
+    @Transactional
     public void likePost(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new SystemException(POST_NOT_FOUND));
+        Post post = postRepository.findById(postId, true).orElseThrow(() -> new SystemException(POST_NOT_FOUND));
         post.increaseLikeCount();
         postRepository.save(post);
     }

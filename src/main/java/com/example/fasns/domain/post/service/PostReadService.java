@@ -31,7 +31,7 @@ public class PostReadService {
     }
 
     public PostDto getPost(Long postId) {
-        return PostDto.toDto(postRepository.findById(postId).get());
+        return PostDto.toDto(postRepository.findById(postId, false).get());
     }
 
     public Page<Post> getPosts(Long memberId, Pageable pageable) {
