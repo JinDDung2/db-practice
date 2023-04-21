@@ -57,6 +57,10 @@ public class PostReadService {
         return new PageCursor<>(request.next(nextKey), posts);
     }
 
+    public List<Post> getPosts(List<Long> ids) {
+        return postRepository.findAllByInId(ids);
+    }
+
     private long getNextKey(List<Post> posts) {
         return posts.stream()
                 .mapToLong(Post::getId).min()
