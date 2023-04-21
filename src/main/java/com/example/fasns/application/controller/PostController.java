@@ -4,7 +4,6 @@ import com.example.fasns.application.usecase.GetTimelinePostUseCase;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.dto.PostCommand;
-import com.example.fasns.domain.post.dto.PostDto;
 import com.example.fasns.domain.post.entity.Post;
 import com.example.fasns.domain.post.service.PostReadService;
 import com.example.fasns.domain.post.service.PostWriteService;
@@ -27,7 +26,7 @@ public class PostController {
     private final GetTimelinePostUseCase getTimelinePostUseCase;
 
     @PostMapping
-    public PostDto create(@RequestBody PostCommand command) {
+    public Long create(@RequestBody PostCommand command) {
         return postWriteService.create(command);
     }
 
