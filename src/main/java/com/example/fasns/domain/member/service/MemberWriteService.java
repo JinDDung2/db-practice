@@ -9,6 +9,7 @@ import com.example.fasns.domain.member.repository.MemberNicknameHistoryRepositor
 import com.example.fasns.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class MemberWriteService {
      * 회원정보등록(이메일, 닉네임, 생년월일)
      * param - memberRegisterCommand
      */
+    @Transactional
     public MemberDto register(MemberRegisterCommand command) {
         Member member = Member.builder()
                 .email(command.getEmail())
@@ -34,6 +36,7 @@ public class MemberWriteService {
         return MemberDto.toDto(saveMember);
     }
 
+    @Transactional
     public void changeNickname(Long memberId, String nickname) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException());
         member.changeNickname(nickname);
