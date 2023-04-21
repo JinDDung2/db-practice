@@ -19,4 +19,10 @@ public class  FollowReadService {
                 .map(FollowDto::toDto)
                 .collect(Collectors.toList());
     }
+
+    public List<FollowDto> getFollowers(Long memberId) {
+        return followRepository.findAllByToMemberId(memberId).stream()
+                .map(FollowDto::toDto)
+                .collect(Collectors.toList());
+    }
 }

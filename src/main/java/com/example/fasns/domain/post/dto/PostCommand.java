@@ -9,6 +9,8 @@ public class PostCommand {
     private String title;
     private String contents;
 
+    public PostCommand() {}
+
     public PostCommand(Long memberId, String title, String contents) {
         this.memberId = memberId;
         this.title = title;
