@@ -18,16 +18,19 @@ public class PostDto {
 
     private String contents;
 
+    private Long likeCount;
+
     private LocalDate createdDate;
 
     private LocalDateTime createdAt;
 
     @Builder
-    public PostDto(Long id, Long memberId, String title, String contents, LocalDate createdDate, LocalDateTime createdAt) {
+    public PostDto(Long id, Long memberId, String title, String contents, Long likeCount, LocalDate createdDate, LocalDateTime createdAt) {
         this.id = id;
         this.memberId = memberId;
         this.title = title;
         this.contents = contents;
+        this.likeCount = likeCount;
         this.createdDate = createdDate;
         this.createdAt = createdAt;
     }
@@ -38,6 +41,7 @@ public class PostDto {
                 .memberId(post.getMemberId())
                 .title(post.getTitle())
                 .contents(post.getContents())
+                .likeCount(post.getLikeCount())
                 .createdAt(post.getCreatedAt())
                 .createdDate(post.getCreatedDate())
                 .build();
