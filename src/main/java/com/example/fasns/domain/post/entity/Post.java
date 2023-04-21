@@ -33,4 +33,8 @@ public class Post {
         this.createdDate = createdDate == null ? LocalDate.now() : createdDate;
         this.createdAt = createdAt == null ? LocalDateTime.now() : createdAt;
     }
+
+    public void increaseLikeCount() {
+        this.likeCount += 1;
+    }
 }

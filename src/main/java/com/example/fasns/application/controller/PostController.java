@@ -5,8 +5,10 @@ import com.example.fasns.application.usecase.GetTimelinePostUseCase;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.dto.PostCommand;
+import com.example.fasns.domain.post.dto.PostDto;
 import com.example.fasns.domain.post.entity.Post;
 import com.example.fasns.domain.post.service.PostReadService;
+import com.example.fasns.domain.post.service.PostWriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,7 @@ import java.util.List;
 public class PostController {
 
     private final PostReadService postReadService;
+    private final PostWriteService postWriteService;
     private final GetTimelinePostUseCase getTimelinePostUseCase;
     private final CreatePostUseCase createPostUseCase;
 
@@ -48,5 +51,15 @@ public class PostController {
     @GetMapping("/members/{memberId}/timeline")
     public PageCursor<Post> getTimeline(@PathVariable Long memberId, CursorRequest cursorRequest) {
         return getTimelinePostUseCase.executeByTimeline(memberId, cursorRequest);
+    }
+
+    @GetMapping("/{postId}")
+    public PostDto getPost(@PathVariable Long postId) {
+        return postReadService.getPost(postId);
+    }
+
+    @PostMapping("/{postId}/like")
+    public void likePost(@PathVariable Long postId) {
+        postWriteService.likePost(postId);
     }
 }

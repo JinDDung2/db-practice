@@ -19,6 +19,7 @@ import utils.PageHelper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -46,12 +47,22 @@ public class PostRepository {
     ));
 
     public List<DailyPostCountDto> groupByCreatedDate(DailyPostCountRequest request) {
-        String sql = String.format("select createdDate, memberId, count(id) as count from %s \n" +
+        String sql = String.format("select createdDate, memberId, count(id) as count \n" +
+                "from %s \n" +
                 "where memberId = :memberId and createdDate between :firstDate and :lastDate \n" +
                 "group by createdDate, memberId", TABLE);
 
         SqlParameterSource params = new BeanPropertySqlParameterSource(request);
         return namedParameterJdbcTemplate.query(sql, params, DAILY_POST_COUNT_DTO_ROW_MAPPER);
+    }
+
+    public Optional<Post> findById(Long postId) {
+        String sql = String.format("SELECT * FROM %s WHERE id = :postId", TABLE);
+
+        SqlParameterSource params = new MapSqlParameterSource().addValue("postId", postId);
+
+        Post post = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
+        return Optional.ofNullable(post);
     }
 
     public Page<Post> findAllByMemberId(Long memberId, Pageable pageable) {
@@ -73,9 +84,7 @@ public class PostRepository {
     }
 
     private Long getCount(Long memberId) {
-        String sql = String.format("SELECT count(id) \n" +
-                "FROM %s \n" +
-                "WHERE memberId = :memberId", TABLE);
+        String sql = String.format("SELECT count(id) FROM %s WHERE memberId = :memberId", TABLE);
 
         SqlParameterSource params = new MapSqlParameterSource().addValue("memberId", memberId);
 
@@ -87,9 +96,7 @@ public class PostRepository {
             return List.of();
         }
 
-        String sql = String.format("SELECT * \n" +
-                "FROM %s \n" +
-                "WHERE id in (:ids)", TABLE);
+        String sql = String.format("SELECT * FROM %s WHERE id in (:ids)", TABLE);
 
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("ids", ids);
@@ -198,7 +205,14 @@ public class PostRepository {
     }
 
     private Post update(Post post) {
-        String sql = String.format("UPDATE %s SET title = :title, contents =:title", TABLE);
+        String sql = String.format("UPDATE %s SET " +
+                "title = :title, \n" +
+                "contents = :contents, \n" +
+                "likeCount = :likeCount, \n" +
+                "createdAt = :createdAt, \n" +
+                "createdDate = :createdDate \n" +
+                "WHERE id = :id", TABLE);
+
         SqlParameterSource params = new BeanPropertySqlParameterSource(post);
         namedParameterJdbcTemplate.update(sql, params);
 
