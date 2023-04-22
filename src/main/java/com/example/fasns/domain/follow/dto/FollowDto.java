@@ -1,6 +1,5 @@
 package com.example.fasns.domain.follow.dto;
 
-import com.example.fasns.domain.follow.entity.Follow;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,14 +22,4 @@ public class FollowDto {
         this.toMemberId = toMemberId;
         this.createdAt = createdAt;
     }
-
-    public static FollowDto toDto(Follow follow) {
-        return FollowDto.builder()
-                .id(follow.getId())
-                .fromMemberId(follow.getFromMemberId())
-                .toMemberId(follow.getToMemberId())
-                .createdAt(follow.getCreatedAt())
-                .build();
-    }
-
 }

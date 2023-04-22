@@ -33,7 +33,7 @@ public class MemberWriteService {
         Member saveMember = memberRepository.save(member);
         saveNicknameHistory(saveMember);
 
-        return MemberDto.toDto(saveMember);
+        return toDto(saveMember);
     }
 
     @Transactional
@@ -53,6 +53,15 @@ public class MemberWriteService {
                 .build();
 
         memberNicknameHistoryRepository.save(memberNicknameHistory);
+    }
+
+    private MemberDto toDto(Member member) {
+        return MemberDto.builder()
+                .id(member.getId())
+                .nickname(member.getNickname())
+                .email(member.getEmail())
+                .birth(member.getBirth())
+                .build();
     }
 
 }
