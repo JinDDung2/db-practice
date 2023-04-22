@@ -20,7 +20,7 @@ public class CreatePostLikeUseCase {
         PostDto post = postReadService.getPost(postId);
         MemberDto member = memberReadService.getMember(memberId);
 
-        postLikeWriteService.create(post.toEntity(), member);
+        postLikeWriteService.create(post, member);
     }
 
 }

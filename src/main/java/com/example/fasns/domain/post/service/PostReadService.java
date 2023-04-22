@@ -93,6 +93,7 @@ public class PostReadService {
     private PostDto toDto(Post post) {
         return PostDto.builder()
                 .id(post.getId())
+                .memberId(post.getMemberId())
                 .title(post.getTitle())
                 .contents(post.getContents())
                 .likeCount(postLikeRepository.count(post.getId()))
