@@ -1,5 +1,6 @@
 package com.example.fasns.application.controller;
 
+import com.example.fasns.application.usecase.CreatePostLikeUseCase;
 import com.example.fasns.application.usecase.CreatePostUseCase;
 import com.example.fasns.application.usecase.GetTimelinePostUseCase;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
@@ -27,6 +28,7 @@ public class PostController {
     private final PostWriteService postWriteService;
     private final GetTimelinePostUseCase getTimelinePostUseCase;
     private final CreatePostUseCase createPostUseCase;
+    private final CreatePostLikeUseCase postLikeUseCase;
 
     @PostMapping
     public Long create(@RequestBody PostCommand command) {
@@ -39,7 +41,7 @@ public class PostController {
     }
 
     @GetMapping("/members/{memberId}")
-    public Page<Post> getPosts(@PathVariable Long memberId, Pageable pageable) {
+    public Page<PostDto> getPosts(@PathVariable Long memberId, Pageable pageable) {
         return postReadService.getPosts(memberId, pageable);
     }
 
@@ -58,9 +60,16 @@ public class PostController {
         return postReadService.getPost(postId);
     }
 
-    @PostMapping("/{postId}/like")
+    @PostMapping("/{postId}/like/v1")
     public void likePost(@PathVariable Long postId) {
 //        postWriteService.likePost(postId);
         postWriteService.likePostWithOptimisticLock(postId);
+    }
+
+    @PostMapping("/{postId}/like/v2")
+    public void likePostV2(@PathVariable Long postId,
+                           @RequestParam Long memberId) {
+//        postWriteService.likePost(postId);
+        postLikeUseCase.execute(postId,  memberId);
     }
 }

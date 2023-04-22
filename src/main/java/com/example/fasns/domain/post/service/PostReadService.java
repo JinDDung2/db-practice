@@ -4,6 +4,7 @@ import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.dto.PostDto;
 import com.example.fasns.domain.post.entity.Post;
+import com.example.fasns.domain.post.repository.PostLikeRepository;
 import com.example.fasns.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import java.util.List;
 public class PostReadService {
 
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
 
     public List<DailyPostCountDto> getDailyPostCount(DailyPostCountRequest request) {
         /*
@@ -31,11 +33,11 @@ public class PostReadService {
     }
 
     public PostDto getPost(Long postId) {
-        return PostDto.toDto(postRepository.findById(postId, false).get());
+        return toDto(postRepository.findById(postId, false).get());
     }
 
-    public Page<Post> getPosts(Long memberId, Pageable pageable) {
-        return postRepository.findAllByMemberId(memberId, pageable);
+    public Page<PostDto> getPosts(Long memberId, Pageable pageable) {
+        return postRepository.findAllByMemberId(memberId, pageable).map(this::toDto);
     }
 
     public PageCursor<Post> getPosts(Long memberId, CursorRequest request) {
@@ -86,6 +88,17 @@ public class PostReadService {
         }
 
         return postRepository.findAllByMemberIdInAndOrderByIdDesc(memberIds, request.getSize());
+    }
+
+    private PostDto toDto(Post post) {
+        return PostDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .contents(post.getContents())
+                .likeCount(postLikeRepository.count(post.getId()))
+                .createdAt(post.getCreatedAt())
+                .createdDate(post.getCreatedDate())
+                .build();
     }
 
 }

@@ -35,6 +35,16 @@ public class PostDto {
         this.createdAt = createdAt;
     }
 
+    public Post toEntity() {
+        return Post.builder()
+                .memberId(memberId)
+                .title(title)
+                .contents(contents)
+                .createdAt(createdAt)
+                .createdDate(createdDate)
+                .build();
+    }
+
     public static PostDto toDto(Post post) {
         return PostDto.builder()
                 .id(post.getId())
