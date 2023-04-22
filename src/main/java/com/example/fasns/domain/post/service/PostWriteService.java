@@ -33,7 +33,14 @@ public class PostWriteService {
      */
     @Transactional
     public void likePost(Long postId) {
+        // 비관적 락은 트랜잭션도 걸어줘야하고, requiredLock도 걸어줘야함
         Post post = postRepository.findById(postId, true).orElseThrow(() -> new SystemException(POST_NOT_FOUND));
+        post.increaseLikeCount();
+        postRepository.save(post);
+    }
+
+    public void likePostWithOptimisticLock(Long postId) {
+        Post post = postRepository.findById(postId, false).orElseThrow(() -> new SystemException(POST_NOT_FOUND));
         post.increaseLikeCount();
         postRepository.save(post);
     }

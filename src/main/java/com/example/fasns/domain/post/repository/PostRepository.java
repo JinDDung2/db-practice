@@ -1,5 +1,7 @@
 package com.example.fasns.domain.post.repository;
 
+import com.example.fasns.common.ErrorCode;
+import com.example.fasns.common.SystemException;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.entity.Post;
@@ -35,6 +37,7 @@ public class PostRepository {
             .title(rs.getString("title"))
             .contents(rs.getString("contents"))
             .likeCount(rs.getLong("likeCount"))
+            .version(rs.getLong("version"))
             .createdDate(rs.getObject("createdDate", LocalDate.class))
             .createdAt(rs.getObject("createdAt", LocalDateTime.class))
             .build()
@@ -214,11 +217,16 @@ public class PostRepository {
                 "contents = :contents, \n" +
                 "likeCount = :likeCount, \n" +
                 "createdAt = :createdAt, \n" +
-                "createdDate = :createdDate \n" +
-                "WHERE id = :id", TABLE);
+                "createdDate = :createdDate, \n" +
+                "version = version + 1 \n" +
+                "WHERE id = :id and version = :version", TABLE);
 
         SqlParameterSource params = new BeanPropertySqlParameterSource(post);
-        namedParameterJdbcTemplate.update(sql, params);
+        int updatedCount = namedParameterJdbcTemplate.update(sql, params);
+
+        if (updatedCount == 0) {
+            throw new SystemException(ErrorCode.UPDATE_COUNT_ZERO);
+        }
 
         return post;
     }

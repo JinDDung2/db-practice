@@ -10,6 +10,7 @@ public enum ErrorCode {
     COMMON_ILLEGAL_STATUS("잘못된 상태값입니다."),
     COMMON_METHOD_NOT_ALLOWED("지원하지 않는 HTTP METHOD 입니다."),
     COMMON_UNSUPPORTED_MEDIA_TYPE("지원하지 않는 MEDIA TYPE 입니다."),
+    UPDATE_COUNT_ZERO("업데이트를 실패했습니다."),
 
     UN_AUTHENTICATED("인증되지 않은 접근입니다."),
     UNAUTHORIZED_ROLE("현재 유저 권한으로는 접근할 수 없는 리소스 요청입니다."),
