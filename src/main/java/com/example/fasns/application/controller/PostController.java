@@ -7,7 +7,6 @@ import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.dto.PostCommand;
 import com.example.fasns.domain.post.dto.PostDto;
-import com.example.fasns.domain.post.entity.Post;
 import com.example.fasns.domain.post.service.PostReadService;
 import com.example.fasns.domain.post.service.PostWriteService;
 import lombok.RequiredArgsConstructor;
@@ -45,13 +44,13 @@ public class PostController {
         return postReadService.getPosts(memberId, pageable);
     }
 
-    @GetMapping("/members/{memberId}/cusror")
-    public PageCursor<Post> getPostsByCursor(@PathVariable Long memberId, CursorRequest cursorRequest) {
+    @GetMapping("/members/{memberId}/cursor")
+    public PageCursor<PostDto> getPostsByCursor(@PathVariable Long memberId, CursorRequest cursorRequest) {
         return postReadService.getPosts(memberId, cursorRequest);
     }
 
     @GetMapping("/members/{memberId}/timeline")
-    public PageCursor<Post> getTimeline(@PathVariable Long memberId, CursorRequest cursorRequest) {
+    public PageCursor<PostDto> getTimeline(@PathVariable Long memberId, CursorRequest cursorRequest) {
         return getTimelinePostUseCase.executeByTimeline(memberId, cursorRequest);
     }
 

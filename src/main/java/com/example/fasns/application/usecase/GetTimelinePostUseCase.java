@@ -2,7 +2,7 @@ package com.example.fasns.application.usecase;
 
 import com.example.fasns.domain.follow.dto.FollowDto;
 import com.example.fasns.domain.follow.service.FollowReadService;
-import com.example.fasns.domain.post.entity.Post;
+import com.example.fasns.domain.post.dto.PostDto;
 import com.example.fasns.domain.post.entity.Timeline;
 import com.example.fasns.domain.post.service.PostReadService;
 import com.example.fasns.domain.post.service.TimelineReadService;
@@ -28,7 +28,7 @@ public class GetTimelinePostUseCase {
      * @param cursorRequest
      * @return
      */
-    public PageCursor<Post> execute(Long memberId, CursorRequest cursorRequest) {
+    public PageCursor<PostDto> execute(Long memberId, CursorRequest cursorRequest) {
         List<FollowDto> followings = followReadService.getFollowings(memberId);
         List<Long> followingIds = followings.stream()
                 .map(FollowDto::getToMemberId)
@@ -41,13 +41,13 @@ public class GetTimelinePostUseCase {
      1. 타임라인 조회
      2. 1번 조건에 해당하는 게시글들 조회
      */
-    public PageCursor<Post> executeByTimeline(Long memberId, CursorRequest cursorRequest) {
+    public PageCursor<PostDto> executeByTimeline(Long memberId, CursorRequest cursorRequest) {
         PageCursor<Timeline> pagedTimelines = timelineReadService.getTimelines(memberId, cursorRequest);
         List<Long> postIds = pagedTimelines.getContents().stream()
                 .map(Timeline::getPostId)
                 .collect(Collectors.toList());
 
-        List<Post> posts = postReadService.getPosts(postIds);
+        List<PostDto> posts = postReadService.getPosts(postIds);
 
         return new PageCursor<>(pagedTimelines.getNextCursorRequest(), posts);
     }

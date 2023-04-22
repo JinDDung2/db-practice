@@ -14,6 +14,7 @@ import utils.CursorRequest;
 import utils.PageCursor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,37 +41,43 @@ public class PostReadService {
         return postRepository.findAllByMemberId(memberId, pageable).map(this::toDto);
     }
 
-    public PageCursor<Post> getPosts(Long memberId, CursorRequest request) {
+    public PageCursor<PostDto> getPosts(Long memberId, CursorRequest request) {
         /*
         SELECT *
         FROM POST
         WHERE memberId = :memberId and id > key // 단 key IS NULL 경우도 생각(맨처음)
          */
-        List<Post> posts = findAll(memberId, request);
+        List<PostDto> posts = findAll(memberId, request).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
         long nextKey = getNextKey(posts);
 
         return new PageCursor<>(request.next(nextKey), posts);
     }
 
-    public PageCursor<Post> getPosts(List<Long> memberIds, CursorRequest request) {
+    public PageCursor<PostDto> getPosts(List<Long> memberIds, CursorRequest request) {
         /*
         SELECT *
         FROM POST
         WHERE memberId = :memberId and id > key // 단 key IS NULL 경우도 생각(맨처음)
          */
-        List<Post> posts = findAll(memberIds , request);
+        List<PostDto> posts = findAll(memberIds , request).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
         long nextKey = getNextKey(posts);
 
         return new PageCursor<>(request.next(nextKey), posts);
     }
 
-    public List<Post> getPosts(List<Long> ids) {
-        return postRepository.findAllByInId(ids);
+    public List<PostDto> getPosts(List<Long> ids) {
+        return postRepository.findAllByInId(ids).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
-    private long getNextKey(List<Post> posts) {
+    private long getNextKey(List<PostDto> posts) {
         return posts.stream()
-                .mapToLong(Post::getId).min()
+                .mapToLong(PostDto::getId).min()
                 .orElse(CursorRequest.NONE_KEY);
     }
 
