@@ -16,6 +16,8 @@ public class Member {
 
     private String email;
 
+    private String password;
+
     private final LocalDate birth;
 
     private final LocalDateTime createdAt;
@@ -23,12 +25,12 @@ public class Member {
     private static final Integer MAX_NICKNAME_LENGTH = 10;
 
     @Builder
-    public Member(Long id, String nickname, String email, LocalDate birth, LocalDateTime createdAt) {
+    public Member(Long id, String nickname, String email, String password, LocalDate birth, LocalDateTime createdAt) {
         this.id = id;
 
         validateNickname(nickname);
         this.nickname = Objects.requireNonNull(nickname);
-
+        this.password = Objects.requireNonNull(password);
         this.email = Objects.requireNonNull(email);
         this.birth = Objects.requireNonNull(birth);
         this.createdAt = createdAt == null ? LocalDateTime.now() : createdAt;

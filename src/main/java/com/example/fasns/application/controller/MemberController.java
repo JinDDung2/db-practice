@@ -2,7 +2,7 @@ package com.example.fasns.application.controller;
 
 import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.dto.MemberNicknameHistoryDto;
-import com.example.fasns.domain.member.dto.MemberRegisterCommand;
+import com.example.fasns.domain.member.dto.MemberRegisterDto;
 import com.example.fasns.domain.member.service.MemberReadService;
 import com.example.fasns.domain.member.service.MemberWriteService;
 import lombok.RequiredArgsConstructor;
@@ -12,30 +12,30 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/members")
+@RequestMapping("/api/members")
 public class MemberController {
 
     private final MemberWriteService memberWriteService;
     private final MemberReadService memberReadService;
 
-    @PostMapping("")
-    public MemberDto register(@RequestBody MemberRegisterCommand command) {
-        return memberWriteService.register(command);
+    @PostMapping("/register")
+    public Response<MemberDto> register(@RequestBody MemberRegisterDto command) {
+        return Response.success(memberWriteService.register(command));
     }
 
     @GetMapping("/{id}")
-    public MemberDto getMember(@PathVariable Long id) {
-        return memberReadService.getMember(id);
+    public Response<MemberDto> getMember(@PathVariable Long id) {
+        return Response.success(memberReadService.getMember(id));
     }
 
     @GetMapping("/{id}/nickname-histories")
-    public List<MemberNicknameHistoryDto> getNicknameHistories(@PathVariable Long id) {
-        return memberReadService.getNicknameHistories(id);
+    public Response<List<MemberNicknameHistoryDto>> getNicknameHistories(@PathVariable Long id) {
+        return Response.success(memberReadService.getNicknameHistories(id));
     }
 
     @PostMapping("/{id}")
-    public MemberDto changeNickname(@PathVariable Long id, @RequestBody String nickname) {
+    public Response<MemberDto> changeNickname(@PathVariable Long id, @RequestBody String nickname) {
         memberWriteService.changeNickname(id, nickname);
-        return memberReadService.getMember(id);
+        return Response.success(memberReadService.getMember(id));
     }
 }

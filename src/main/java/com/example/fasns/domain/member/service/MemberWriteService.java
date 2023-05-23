@@ -2,7 +2,7 @@ package com.example.fasns.domain.member.service;
 
 import com.example.fasns.domain.exception.NotFoundException;
 import com.example.fasns.domain.member.dto.MemberDto;
-import com.example.fasns.domain.member.dto.MemberRegisterCommand;
+import com.example.fasns.domain.member.dto.MemberRegisterDto;
 import com.example.fasns.domain.member.entity.Member;
 import com.example.fasns.domain.member.entity.MemberNicknameHistory;
 import com.example.fasns.domain.member.repository.MemberNicknameHistoryRepository;
@@ -23,11 +23,11 @@ public class MemberWriteService {
      * param - memberRegisterCommand
      */
     @Transactional
-    public MemberDto register(MemberRegisterCommand command) {
+    public MemberDto register(MemberRegisterDto registerDto) {
         Member member = Member.builder()
-                .email(command.getEmail())
-                .nickname(command.getNickname())
-                .birth(command.getBirth())
+                .email(registerDto.getEmail())
+                .nickname(registerDto.getNickname())
+                .birth(registerDto.getBirth())
                 .build();
 
         Member saveMember = memberRepository.save(member);

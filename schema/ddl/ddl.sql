@@ -3,6 +3,7 @@ create table Member
     id int auto_increment,
     email varchar(20) not null,
     nickname varchar(20) not null,
+    password varchar(30) not null,
     birth date not null,
     createdAt datetime not null,
     constraint member_id_uindex

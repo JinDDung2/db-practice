@@ -10,19 +10,20 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/follow")
+@RequestMapping("/api/follow")
 public class FollowController {
 
     private final CreateFollowMemberUseCase createFollowMemberUseCase;
     private final GetFollowMemberUseCase getFollowMemberUseCase;
 
     @PostMapping("/{fromMemberId}/{toMemberId}")
-    public void register(@PathVariable Long fromMemberId, @PathVariable Long toMemberId) {
+    public Response register(@PathVariable Long fromMemberId, @PathVariable Long toMemberId) {
         createFollowMemberUseCase.execute(fromMemberId, toMemberId);
+        return Response.success();
     }
 
     @GetMapping("/members/{memberId}")
-    public List<MemberDto> getFollowings(@PathVariable Long memberId) {
-        return getFollowMemberUseCase.execute(memberId);
+    public Response<List<MemberDto>> getFollowings(@PathVariable Long memberId) {
+        return Response.success(getFollowMemberUseCase.execute(memberId));
     }
 }
