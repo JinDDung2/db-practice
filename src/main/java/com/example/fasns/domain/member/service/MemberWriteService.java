@@ -1,6 +1,7 @@
 package com.example.fasns.domain.member.service;
 
-import com.example.fasns.domain.exception.NotFoundException;
+import com.example.fasns.common.ErrorCode;
+import com.example.fasns.common.SystemException;
 import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.dto.MemberRegisterDto;
 import com.example.fasns.domain.member.entity.Member;
@@ -8,6 +9,7 @@ import com.example.fasns.domain.member.entity.MemberNicknameHistory;
 import com.example.fasns.domain.member.repository.MemberNicknameHistoryRepository;
 import com.example.fasns.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,16 +19,18 @@ public class MemberWriteService {
 
     private final MemberRepository memberRepository;
     private final MemberNicknameHistoryRepository memberNicknameHistoryRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
-     * 회원정보등록(이메일, 닉네임, 생년월일)
-     * param - memberRegisterCommand
+     * 회원정보등록(이메일, 비밀번호, 닉네임, 생년월일)
+     * param - memberRegisterDto
      */
     @Transactional
     public MemberDto register(MemberRegisterDto registerDto) {
         Member member = Member.builder()
                 .email(registerDto.getEmail())
                 .nickname(registerDto.getNickname())
+                .password(passwordEncoder.encode(registerDto.getPassword()))
                 .birth(registerDto.getBirth())
                 .build();
 
@@ -38,7 +42,9 @@ public class MemberWriteService {
 
     @Transactional
     public void changeNickname(Long memberId, String nickname) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException());
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new SystemException(String.format("%s %s", memberId, ErrorCode.USER_NOT_FOUND.getMessage()),
+                        ErrorCode.USER_NOT_FOUND));
         member.changeNickname(nickname);
         memberRepository.save(member);
 

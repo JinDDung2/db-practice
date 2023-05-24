@@ -27,10 +27,20 @@ public class MemberRepository {
     private static final RowMapper<Member> ROW_MAPPER = (ResultSet rs, int rowNums) -> Member.builder()
             .id(rs.getLong("id"))
             .email(rs.getString("email"))
+            .password(rs.getString("password"))
             .nickname(rs.getString("nickname"))
             .birth(rs.getObject("birth", LocalDate.class))
             .createdAt(rs.getObject("createdAt", LocalDateTime.class))
             .build();
+
+    public Optional<Member> findByEmail(String email) {
+        String sql = String.format("select * from %s where email = :email", TABLE);
+        MapSqlParameterSource param = new MapSqlParameterSource()
+                .addValue("email", email);
+
+        Member member = namedParameterJdbcTemplate.queryForObject(sql, param, ROW_MAPPER);
+        return Optional.ofNullable(member);
+    }
 
     public Optional<Member> findById(Long id) {
         String sql = String.format("select * from %s where id = :id", TABLE);
@@ -69,6 +79,7 @@ public class MemberRepository {
         return Member.builder()
                 .id(id)
                 .email(member.getEmail())
+                .password(member.getPassword())
                 .birth(member.getBirth())
                 .nickname(member.getNickname())
                 .createdAt(member.getCreatedAt())
@@ -81,4 +92,5 @@ public class MemberRepository {
         namedParameterJdbcTemplate.update(sql, params);
         return member;
     }
+
 }
