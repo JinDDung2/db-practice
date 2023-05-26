@@ -1,9 +1,6 @@
 package com.example.fasns.application.controller;
 
-import com.example.fasns.domain.member.dto.MemberDto;
-import com.example.fasns.domain.member.dto.MemberLoginDto;
-import com.example.fasns.domain.member.dto.MemberNicknameHistoryDto;
-import com.example.fasns.domain.member.dto.MemberRegisterDto;
+import com.example.fasns.domain.member.dto.*;
 import com.example.fasns.domain.member.service.MemberReadService;
 import com.example.fasns.domain.member.service.MemberWriteService;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +22,18 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public Response<MemberLoginDto.TokenResDto> login(@RequestBody MemberLoginDto loginDto) {
+    public Response<TokenInfo> login(@RequestBody MemberLoginDto loginDto) {
         return Response.success(memberReadService.login(loginDto));
+    }
+
+    @PostMapping("/reissue")
+    public Response<TokenDto> reissue(@RequestBody TokenDto tokenDto) {
+        return Response.success(memberReadService.reissue(tokenDto));
+    }
+
+    @PostMapping("/logout")
+    public Response<TokenDto> logout(@RequestBody TokenDto tokenDto) {
+        return Response.success(memberReadService.logout(tokenDto));
     }
 
     @GetMapping("/{id}")

@@ -1,8 +1,9 @@
 package com.example.fasns.jwt;
 
 import com.example.fasns.common.ErrorCode;
+import com.example.fasns.common.RedisDao;
 import com.example.fasns.common.SystemException;
-import com.example.fasns.domain.member.dto.MemberLoginDto;
+import com.example.fasns.domain.member.dto.TokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -31,15 +33,19 @@ public class JwtTokenProvider {
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000L;              // 30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;    // 7일
 
+    private final RedisDao redisDao;
     private final Key key;
 
-    public JwtTokenProvider(@Value("${JWT.SECRET}") String secretKey) {
+    public JwtTokenProvider(@Value("${JWT.SECRET}") String secretKey,
+                            RedisDao redisDao)
+    {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.redisDao = redisDao;
     }
 
     // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
-    public MemberLoginDto.TokenResDto generateToken(Authentication authentication) {
+    public TokenInfo generateToken(Authentication authentication) {
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -61,7 +67,10 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        return MemberLoginDto.TokenResDto.builder()
+        // Reids에 refresh Token 넣기
+        redisDao.setValues(authentication.getName(), refreshToken, Duration.ofMillis(REFRESH_TOKEN_EXPIRE_TIME));
+
+        return TokenInfo.builder()
                 .grantType(BEARER_TYPE)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

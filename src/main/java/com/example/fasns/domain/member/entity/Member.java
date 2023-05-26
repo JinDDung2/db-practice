@@ -14,9 +14,9 @@ public class Member {
 
     private String nickname;
 
-    private String email;
+    private final String email;
 
-    private String password;
+    private final String password;
 
     private final LocalDate birth;
 

@@ -8,6 +8,10 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  redis:
+    port: ${spring.redis.port}
+    host: ${spring.redis.host}
+
 # jwt
 jwt:
   secret: ${jwt.secret}
