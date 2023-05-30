@@ -30,9 +30,15 @@ public class WebConfig {
             "/api/members/**"
     };
 
+    private final String[] POST_PERMMIT = {
+            "/api/posts/**",
+    };
+
     private final String[] POST_AUTH = {
             "/api/posts",
-            "/api/posts/**"
+            "/api/posts/members/**",
+            "/api/posts/members/**/cursor",
+            "/api/posts/members/**/timeline",
     };
 
     private final String[] FOLLOW_AUTH = {
@@ -54,6 +60,7 @@ public class WebConfig {
                 .authorizeHttpRequests()
                 .antMatchers(SWAGGER).permitAll()
                 .antMatchers(MEMBER_PERMIT).permitAll()
+                .antMatchers(POST_PERMMIT).permitAll()
                 .antMatchers(MEMBER_AUTH).authenticated()
                 .antMatchers(FOLLOW_AUTH).authenticated()
                 .antMatchers(POST_AUTH).authenticated();
