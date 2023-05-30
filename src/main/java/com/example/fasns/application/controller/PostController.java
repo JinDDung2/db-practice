@@ -18,6 +18,8 @@ import utils.PageCursor;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/posts")
@@ -31,39 +33,39 @@ public class PostController {
 
     @PostMapping
     public Response<Long> create(@RequestBody PostCommand command) {
-        return Response.success(createPostUseCase.execute(command));
+        return Response.success(createPostUseCase.execute(command), CREATED);
     }
 
     @GetMapping("/daily-post-counts")
     public Response<List<DailyPostCountDto>> getDailyPostCount(DailyPostCountRequest request) {
-        return Response.success(postReadService.getDailyPostCount(request));
+        return Response.success(postReadService.getDailyPostCount(request), OK);
     }
 
     @GetMapping("/members/{memberId}")
     public Response<Page<PostDto>> getPosts(@PathVariable Long memberId, Pageable pageable) {
-        return Response.success(postReadService.getPosts(memberId, pageable));
+        return Response.success(postReadService.getPosts(memberId, pageable), OK);
     }
 
     @GetMapping("/members/{memberId}/cursor")
     public Response<PageCursor<PostDto>> getPostsByCursor(@PathVariable Long memberId, CursorRequest cursorRequest) {
-        return Response.success(postReadService.getPosts(memberId, cursorRequest));
+        return Response.success(postReadService.getPosts(memberId, cursorRequest), OK);
     }
 
     @GetMapping("/members/{memberId}/timeline")
     public Response<PageCursor<PostDto>> getTimeline(@PathVariable Long memberId, CursorRequest cursorRequest) {
-        return Response.success(getTimelinePostUseCase.executeByTimeline(memberId, cursorRequest));
+        return Response.success(getTimelinePostUseCase.executeByTimeline(memberId, cursorRequest), OK);
     }
 
     @GetMapping("/{postId}")
     public Response<PostDto> getPost(@PathVariable Long postId) {
-        return Response.success(postReadService.getPost(postId));
+        return Response.success(postReadService.getPost(postId), OK);
     }
 
     @PostMapping("/{postId}/like/v1")
     public Response likePost(@PathVariable Long postId) {
 //        postWriteService.likePost(postId);
         postWriteService.likePostWithOptimisticLock(postId);
-        return Response.success();
+        return Response.success(OK);
     }
 
     @PostMapping("/{postId}/like/v2")
@@ -71,6 +73,6 @@ public class PostController {
                            @RequestParam Long memberId) {
 //        postWriteService.likePost(postId);
         postLikeUseCase.execute(postId,  memberId);
-        return Response.success();
+        return Response.success(OK);
     }
 }
