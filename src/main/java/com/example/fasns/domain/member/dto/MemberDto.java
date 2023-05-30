@@ -13,6 +13,8 @@ public class MemberDto {
     private String email;
     private LocalDate birth;
 
+    public MemberDto() {}
+
     @Builder
     public MemberDto(Long id, String nickname, String email, LocalDate birth) {
         this.id = id;

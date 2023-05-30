@@ -17,7 +17,8 @@ public class FollowController {
     private final GetFollowMemberUseCase getFollowMemberUseCase;
 
     @PostMapping("/{fromMemberId}/{toMemberId}")
-    public Response register(@PathVariable Long fromMemberId, @PathVariable Long toMemberId) {
+    public Response<?> following(@PathVariable Long fromMemberId,
+                                 @PathVariable Long toMemberId) {
         createFollowMemberUseCase.execute(fromMemberId, toMemberId);
         return Response.success();
     }

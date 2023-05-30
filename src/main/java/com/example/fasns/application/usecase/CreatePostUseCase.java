@@ -6,6 +6,7 @@ import com.example.fasns.domain.post.dto.PostCommand;
 import com.example.fasns.domain.post.service.PostWriteService;
 import com.example.fasns.domain.post.service.TimelineWriteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class CreatePostUseCase {
     private final FollowReadService followReadService;
     private final TimelineWriteService timelineWriteService;
 
+    @CacheEvict(cacheNames = "feed", key = "#command.memberId")
     public Long execute(PostCommand command) {
         Long postId = postWriteService.create(command);
 

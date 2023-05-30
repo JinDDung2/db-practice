@@ -24,6 +24,8 @@ public class PostDto {
 
     private LocalDateTime createdAt;
 
+    public PostDto() {}
+
     @Builder
     public PostDto(Long id, Long memberId, String title, String contents, Long likeCount, LocalDate createdDate, LocalDateTime createdAt) {
         this.id = id;
@@ -42,18 +44,6 @@ public class PostDto {
                 .contents(contents)
                 .createdAt(createdAt)
                 .createdDate(createdDate)
-                .build();
-    }
-
-    public static PostDto toDto(Post post) {
-        return PostDto.builder()
-                .id(post.getId())
-                .memberId(post.getMemberId())
-                .title(post.getTitle())
-                .contents(post.getContents())
-                .likeCount(post.getLikeCount())
-                .createdAt(post.getCreatedAt())
-                .createdDate(post.getCreatedDate())
                 .build();
     }
 }

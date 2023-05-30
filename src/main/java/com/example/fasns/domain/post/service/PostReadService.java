@@ -7,6 +7,7 @@ import com.example.fasns.domain.post.entity.Post;
 import com.example.fasns.domain.post.repository.PostLikeRepository;
 import com.example.fasns.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class PostReadService {
         return postRepository.groupByCreatedDate(request);
     }
 
+    @Cacheable(cacheNames = "post", key = "#postId")
     public PostDto getPost(Long postId) {
         return toDto(postRepository.findById(postId, false).get());
     }
@@ -41,6 +43,7 @@ public class PostReadService {
         return postRepository.findAllByMemberId(memberId, pageable).map(this::toDto);
     }
 
+    @Cacheable(cacheNames = "feed", key = "#postId")
     public PageCursor<PostDto> getPosts(Long memberId, CursorRequest request) {
         /*
         SELECT *

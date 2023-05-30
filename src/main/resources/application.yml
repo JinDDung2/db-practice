@@ -1,4 +1,14 @@
 spring:
+  data:
+    redis:
+      cache:
+        host: ${spring.data.redis.cache.host}
+        port: ${spring.data.redis.cache.port}
+      auth:
+        host: ${spring.data.redis.auth.host}
+        port: ${spring.data.redis.auth.port}
+
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${spring.datasource.username}
@@ -7,10 +17,6 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-
-  redis:
-    port: ${spring.redis.port}
-    host: ${spring.redis.host}
 
 # jwt
 jwt:
