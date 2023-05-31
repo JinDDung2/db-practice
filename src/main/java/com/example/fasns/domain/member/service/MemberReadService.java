@@ -48,8 +48,9 @@ public class MemberReadService {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
-    public List<MemberNicknameHistoryDto> getNicknameHistories(Long memberId) {
-        return memberNicknameHistoryRepository.findAllByMemberId(memberId)
+    public List<MemberNicknameHistoryDto> getNicknameHistories(String email) {
+        Member member = validateMember(email);
+        return memberNicknameHistoryRepository.findAllByMemberId(member.getId())
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
@@ -74,7 +75,7 @@ public class MemberReadService {
     }
 
     public TokenInfo login(MemberLoginDto loginDto) {
-        Member member = validateMember(loginDto);
+        validateMember(loginDto.getEmail());
 
         // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
         // authentication 에서 인증 여부를 확인하는 authenticated 값이 false
@@ -144,9 +145,9 @@ public class MemberReadService {
         return tokenDto;
     }
 
-    private Member validateMember(MemberLoginDto loginDto) {
-        return memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() ->
-                new SystemException(String.format("%s %s", loginDto.getEmail(), USER_NOT_FOUND.getMessage()),
+    private Member validateMember(String email) {
+        return memberRepository.findByEmail(email).orElseThrow(() ->
+                new SystemException(String.format("%s %s", email, USER_NOT_FOUND.getMessage()),
                         USER_NOT_FOUND)
         );
     }

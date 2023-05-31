@@ -4,6 +4,7 @@ import com.example.fasns.domain.member.dto.*;
 import com.example.fasns.domain.member.service.MemberReadService;
 import com.example.fasns.domain.member.service.MemberWriteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,19 +39,25 @@ public class MemberController {
         return Response.success(memberReadService.logout(tokenDto), OK);
     }
 
-    @GetMapping("/{id}")
-    public Response<MemberDto> getMember(@PathVariable Long id) {
-        return Response.success(memberReadService.getMember(id), OK);
+    @GetMapping("")
+    public Response<MemberDto> getMember(Authentication authentication) {
+        return Response.success(memberReadService.getMember(authentication.getName()), OK);
     }
 
-    @GetMapping("/{id}/nickname-histories")
-    public Response<List<MemberNicknameHistoryDto>> getNicknameHistories(@PathVariable Long id) {
-        return Response.success(memberReadService.getNicknameHistories(id), OK);
+    @GetMapping("/nickname-histories")
+    public Response<List<MemberNicknameHistoryDto>> getNicknameHistories(Authentication authentication) {
+        return Response.success(memberReadService.getNicknameHistories(authentication.getName()), OK);
     }
 
-    @PostMapping("/{id}")
-    public Response<MemberDto> changeNickname(@PathVariable Long id, @RequestBody String nickname) {
-        memberWriteService.changeNickname(id, nickname);
-        return Response.success(memberReadService.getMember(id), OK);
+    @PostMapping("")
+    public Response<MemberDto> changeNickname(Authentication authentication, @RequestBody String nickname) {
+        memberWriteService.changeNickname(authentication.getName(), nickname);
+        return Response.success(memberReadService.getMember(authentication.getName()), OK);
+    }
+
+    @DeleteMapping("")
+    public Response<Void> delete(Authentication authentication) {
+        memberWriteService.delete(authentication.getName());
+        return Response.success(OK);
     }
 }

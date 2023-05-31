@@ -41,15 +41,32 @@ public class MemberWriteService {
     }
 
     @Transactional
-    public void changeNickname(Long memberId, String nickname) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() ->
-                new SystemException(String.format("%s %s", memberId, ErrorCode.USER_NOT_FOUND.getMessage()),
-                        ErrorCode.USER_NOT_FOUND));
+    public void changeNickname(String email, String nickname) {
+        Member member = validateMember(email);
         member.changeNickname(nickname);
         memberRepository.save(member);
 
         // 이름 변경 히스토리 저장
         saveNicknameHistory(member);
+    }
+
+    @Transactional
+    public void delete(String email) {
+        Member member = validateMember(email);
+        memberRepository.delete(member);
+        memberNicknameHistoryRepository.delete(member.getId());
+    }
+
+    private Member validateMember(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() ->
+                new SystemException(String.format("%s %s", memberId, ErrorCode.USER_NOT_FOUND.getMessage()),
+                        ErrorCode.USER_NOT_FOUND));
+    }
+
+    private Member validateMember(String email) {
+        return memberRepository.findByEmail(email).orElseThrow(() ->
+                new SystemException(String.format("%s %s", email, ErrorCode.USER_NOT_FOUND.getMessage()),
+                        ErrorCode.USER_NOT_FOUND));
     }
 
     private void saveNicknameHistory(Member member) {
@@ -69,5 +86,4 @@ public class MemberWriteService {
                 .birth(member.getBirth())
                 .build();
     }
-
 }

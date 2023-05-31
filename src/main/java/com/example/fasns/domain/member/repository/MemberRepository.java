@@ -68,6 +68,12 @@ public class MemberRepository {
         return update(member);
     }
 
+    public void delete(Member member) {
+        String sql = String.format("DELETE FROM %s WHERE id = :id", TABLE);
+        SqlParameterSource params = new BeanPropertySqlParameterSource(member);
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
     private Member insert(Member member) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(namedParameterJdbcTemplate.getJdbcTemplate())
                 .withTableName(TABLE)
@@ -92,5 +98,4 @@ public class MemberRepository {
         namedParameterJdbcTemplate.update(sql, params);
         return member;
     }
-
 }

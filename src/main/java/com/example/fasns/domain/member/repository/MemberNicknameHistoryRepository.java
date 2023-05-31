@@ -57,4 +57,10 @@ public class MemberNicknameHistoryRepository {
                 .createdAt(history.getCreatedAt())
                 .build();
     }
+
+    public void delete(Long memberId) {
+        String sql = String.format("DELETE FROM %s WHERE memberId = :memberId", TABLE);
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue("memberId", memberId);
+        namedParameterJdbcTemplate.update(sql, params);
+    }
 }
