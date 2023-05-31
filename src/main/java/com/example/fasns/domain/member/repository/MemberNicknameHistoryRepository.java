@@ -22,16 +22,18 @@ public class MemberNicknameHistoryRepository {
 
     private static final String TABLE = "MemberNicknameHistory";
 
+    private static final String MEMBER_ID = "memberId";
+
     private static final RowMapper<MemberNicknameHistory> rowMapper = (ResultSet rs, int rowNums) -> MemberNicknameHistory.builder()
             .id(rs.getLong("id"))
-            .memberId(rs.getLong("memberId"))
+            .memberId(rs.getLong(MEMBER_ID))
             .nickname(rs.getString("nickname"))
             .createdAt(rs.getObject("createdAt", LocalDateTime.class))
             .build();
 
     public List<MemberNicknameHistory> findAllByMemberId(Long memberId) {
         String sql = String.format("SELECT * FROM %s WHERE memberId = :memberId", TABLE);
-        MapSqlParameterSource params = new MapSqlParameterSource().addValue("memberId", memberId);
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue(MEMBER_ID, memberId);
         return namedParameterJdbcTemplate.query(sql, params, rowMapper);
     }
 
@@ -60,7 +62,7 @@ public class MemberNicknameHistoryRepository {
 
     public void delete(Long memberId) {
         String sql = String.format("DELETE FROM %s WHERE memberId = :memberId", TABLE);
-        MapSqlParameterSource params = new MapSqlParameterSource().addValue("memberId", memberId);
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue(MEMBER_ID, memberId);
         namedParameterJdbcTemplate.update(sql, params);
     }
 }
