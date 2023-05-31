@@ -38,6 +38,10 @@ public class MemberReadService {
         return toDto(memberRepository.findById(id).orElseThrow());
     }
 
+    public MemberDto getMember(String email) {
+        return toDto(memberRepository.findByEmail(email).orElseThrow());
+    }
+
     public List<MemberDto> getMembers(List<Long> ids) {
         return memberRepository.findAllByIdIn(ids)
                 .stream()

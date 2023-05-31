@@ -51,6 +51,14 @@ public class FollowRepository {
         throw new UnsupportedOperationException("Follow는 업데이트를 지원하지 않습니다.");
     }
 
+    public void delete(Long fromMemberId, Long toMemberId) {
+        String sql = String.format("DELETE FROM %s WHERE fromMemberId = :fromMemberId AND toMemberId = :toMemberId", TABLE);
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("fromMemberId", fromMemberId)
+                .addValue("toMemberId", toMemberId);
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
     private Follow insert(Follow follow) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(namedParameterJdbcTemplate.getJdbcTemplate())
                 .withTableName(TABLE)

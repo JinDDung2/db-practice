@@ -13,7 +13,7 @@ public class FollowWriteService {
 
     private final FollowRepository followRepository;
 
-    public Follow create(MemberDto fromMember, MemberDto toMember) {
+    public void create(MemberDto fromMember, MemberDto toMember) {
         Assert.isTrue(!fromMember.getId().equals(toMember.getId()), "자기 자신을 팔로우 할 수 없습니다.");
 
         Follow follow = Follow.builder()
@@ -21,7 +21,13 @@ public class FollowWriteService {
                 .toMemberId(toMember.getId())
                 .build();
 
-        return followRepository.save(follow);
+        followRepository.save(follow);
+    }
+
+    public void delete(MemberDto fromMember, MemberDto toMember) {
+        Assert.isTrue(!fromMember.getId().equals(toMember.getId()), "자기 자신을 언팔로우 할 수 없습니다.");
+
+        followRepository.delete(fromMember.getId(), toMember.getId());
     }
 
 

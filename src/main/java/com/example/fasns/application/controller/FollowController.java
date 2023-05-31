@@ -26,12 +26,12 @@ public class FollowController {
         return Response.success(OK);
     }
 
-//    @DeleteMapping("/{toMemberId}")
-//    public Response<?> unFollowing(Authentication authentication,
-//                                  @PathVariable Long toMemberId) {
-//        followMemberUseCase.unFollowing(authentication.getName(), toMemberId);
-//        return Response.success(OK);
-//    }
+    @DeleteMapping("/{toMemberId}")
+    public Response<?> unFollowing(Authentication authentication,
+                                  @PathVariable Long toMemberId) {
+        followMemberUseCase.unFollowing(authentication.getName(), toMemberId);
+        return Response.success(OK);
+    }
 
     @GetMapping("/members/{memberId}")
     public Response<List<MemberDto>> getFollowings(@PathVariable Long memberId) {
