@@ -1,9 +1,8 @@
-package com.example.fasns.jwt;
+package com.example.fasns.global.jwt;
 
-import com.example.fasns.common.ErrorCode;
-import com.example.fasns.common.RedisDao;
-import com.example.fasns.common.SystemException;
 import com.example.fasns.domain.member.dto.TokenInfo;
+import com.example.fasns.global.exception.RedisDao;
+import com.example.fasns.global.security.MemberDetailService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -12,15 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -35,13 +30,16 @@ public class JwtTokenProvider {
 
     private final RedisDao redisDao;
     private final Key key;
+    private final MemberDetailService memberDetailService;
 
     public JwtTokenProvider(@Value("${JWT.SECRET}") String secretKey,
-                            RedisDao redisDao)
+                            RedisDao redisDao,
+                            MemberDetailService memberDetailService)
     {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.redisDao = redisDao;
+        this.memberDetailService = memberDetailService;
     }
 
     // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
@@ -82,20 +80,8 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String accessToken) {
         // 토큰 복호화
         Claims claims = parseClaims(accessToken);
-
-        if (claims.get(AUTHORITIES_KEY) == null) {
-            throw new SystemException(ErrorCode.INVALID_TOKEN);
-        }
-
-        // 클레임에서 권한 정보 가져오기
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-        // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        UserDetails userDetails = memberDetailService.loadUserByUsername(claims.getSubject());
+        return new UsernamePasswordAuthenticationToken(userDetails, accessToken, userDetails.getAuthorities());
     }
 
     // 토큰 정보를 검증하는 메서드
