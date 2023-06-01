@@ -1,9 +1,9 @@
 package com.example.fasns.domain.post.service;
 
-import com.example.fasns.global.exception.SystemException;
-import com.example.fasns.domain.post.dto.PostCommand;
+import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.post.entity.Post;
 import com.example.fasns.domain.post.repository.PostRepository;
+import com.example.fasns.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +16,10 @@ public class PostWriteService {
 
     private final PostRepository postRepository;
 
-    public Long create(PostCommand command) {
+    public Long create(MemberDto member, String content) {
         Post post = Post.builder()
-                .memberId(command.getMemberId())
-                .title(command.getTitle())
-                .contents(command.getContents())
+                .memberId(member.getId())
+                .contents(content)
                 .build();
         return postRepository.save(post).getId();
     }

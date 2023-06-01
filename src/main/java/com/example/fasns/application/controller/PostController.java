@@ -5,20 +5,22 @@ import com.example.fasns.application.usecase.CreatePostUseCase;
 import com.example.fasns.application.usecase.GetTimelinePostUseCase;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
-import com.example.fasns.domain.post.dto.PostCommand;
 import com.example.fasns.domain.post.dto.PostDto;
 import com.example.fasns.domain.post.service.PostReadService;
 import com.example.fasns.domain.post.service.PostWriteService;
+import com.example.fasns.global.security.MemberDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import utils.CursorRequest;
 import utils.PageCursor;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,8 +34,9 @@ public class PostController {
     private final CreatePostLikeUseCase postLikeUseCase;
 
     @PostMapping
-    public Response<Long> create(@RequestBody PostCommand command) {
-        return Response.success(createPostUseCase.execute(command), CREATED);
+    public Response<Long> create(@AuthenticationPrincipal MemberDetail member,
+                                 @RequestBody String content) {
+        return Response.success(createPostUseCase.execute(member.getUsername(), content), CREATED);
     }
 
     @GetMapping("/daily-post-counts")
@@ -62,16 +65,14 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/like/v1")
-    public Response likePost(@PathVariable Long postId) {
-//        postWriteService.likePost(postId);
+    public Response<Void> likePost(@PathVariable Long postId) {
         postWriteService.likePostWithOptimisticLock(postId);
         return Response.success(OK);
     }
 
     @PostMapping("/{postId}/like/v2")
-    public Response likePostV2(@PathVariable Long postId,
+    public Response<Void> likePostV2(@PathVariable Long postId,
                            @RequestParam Long memberId) {
-//        postWriteService.likePost(postId);
         postLikeUseCase.execute(postId,  memberId);
         return Response.success(OK);
     }

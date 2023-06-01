@@ -6,6 +6,8 @@ import com.example.fasns.domain.post.dto.PostDto;
 import com.example.fasns.domain.post.entity.Post;
 import com.example.fasns.domain.post.repository.PostLikeRepository;
 import com.example.fasns.domain.post.repository.PostRepository;
+import com.example.fasns.global.exception.ErrorCode;
+import com.example.fasns.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -36,7 +38,8 @@ public class PostReadService {
 
     @Cacheable(cacheNames = "post", key = "#postId")
     public PostDto getPost(Long postId) {
-        return toDto(postRepository.findById(postId, false).get());
+        return toDto(postRepository.findById(postId, false).orElseThrow(() ->
+                new SystemException(ErrorCode.POST_NOT_FOUND)));
     }
 
     public Page<PostDto> getPosts(Long memberId, Pageable pageable) {
@@ -104,7 +107,6 @@ public class PostReadService {
         return PostDto.builder()
                 .id(post.getId())
                 .memberId(post.getMemberId())
-                .title(post.getTitle())
                 .contents(post.getContents())
                 .likeCount(postLikeRepository.count(post.getId()))
                 .createdAt(post.getCreatedAt())
