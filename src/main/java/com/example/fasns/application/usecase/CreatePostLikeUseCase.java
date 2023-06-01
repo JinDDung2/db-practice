@@ -16,7 +16,7 @@ public class CreatePostLikeUseCase {
     private final MemberReadService memberReadService;
     private final PostLikeWriteService postLikeWriteService;
 
-    public void execute(Long postId, Long memberId) {
+    public void execute(Long memberId, Long postId) {
         PostDto post = postReadService.getPost(postId);
         MemberDto member = memberReadService.getMember(memberId);
 

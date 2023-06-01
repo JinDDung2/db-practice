@@ -30,7 +30,7 @@ public class PostLikeRepository {
     );
 
 
-    public Long count(Long postId) {
+    public Long countByPostId(Long postId) {
         String sql = String.format("SELECT count(id) FROM %s WHERE postId = :postId", TABLE);
 
         SqlParameterSource params = new MapSqlParameterSource().addValue("postId", postId);

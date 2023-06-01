@@ -27,7 +27,8 @@ public enum ErrorCode {
     PASSWORD_IS_SAME_BEFORE_PASSWORD("이전 비밀번호와 같습니다.", BAD_REQUEST),
 
     // Post Error
-    POST_NOT_FOUND("게시글을 찾을 수 없습니다.", BAD_REQUEST);
+    POST_NOT_FOUND("게시글을 찾을 수 없습니다.", BAD_REQUEST),
+    NOT_PERMISSION_FOR_CORRESPONDING_POST("해당 게시물의 수정 권한이 없습니다.", UNAUTHORIZED);
 
     private final String message;
     private final HttpStatus httpStatus;

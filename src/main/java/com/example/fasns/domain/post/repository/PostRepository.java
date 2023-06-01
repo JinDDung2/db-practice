@@ -184,8 +184,8 @@ public class PostRepository {
     }
 
     public void bulkInsert(List<Post> posts) {
-        String sql = String.format("INSERT INTO %s (memberId, title, contents, createdDate, createdAt) \n" +
-                "VALUES (:memberId, :title, :contents, :createdDate, :createdAt)", TABLE);
+        String sql = String.format("INSERT INTO %s (memberId, contents, createdDate, createdAt) \n" +
+                "VALUES (:memberId, :contents, :createdDate, :createdAt)", TABLE);
 
         SqlParameterSource[] params = posts.stream()
                 .map(BeanPropertySqlParameterSource::new)
@@ -212,7 +212,6 @@ public class PostRepository {
 
     private Post update(Post post) {
         String sql = String.format("UPDATE %s SET " +
-                "title = :title, \n" +
                 "contents = :contents, \n" +
                 "likeCount = :likeCount, \n" +
                 "createdAt = :createdAt, \n" +

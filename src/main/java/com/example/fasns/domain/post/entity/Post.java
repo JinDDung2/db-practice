@@ -34,6 +34,9 @@ public class Post {
         this.createdAt = createdAt == null ? LocalDateTime.now() : createdAt;
     }
 
+    public void updateContent(String content) {
+        this.contents = Objects.requireNonNull(content);
+    }
     public void increaseLikeCount() {
         this.likeCount += 1;
     }

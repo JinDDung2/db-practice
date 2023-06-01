@@ -39,24 +39,32 @@ public class PostController {
         return Response.success(createPostUseCase.execute(member.getUsername(), content), CREATED);
     }
 
+    @PostMapping("/{postId}/change/content")
+    public Response<PostDto> updateContent(@AuthenticationPrincipal MemberDetail member,
+                                           @PathVariable Long postId,
+                                           @RequestBody String content) {
+        postWriteService.update(member.getMember().getId(), postId, content);
+        return Response.success(OK);
+    }
+
     @GetMapping("/daily-post-counts")
     public Response<List<DailyPostCountDto>> getDailyPostCount(DailyPostCountRequest request) {
         return Response.success(postReadService.getDailyPostCount(request), OK);
     }
 
-    @GetMapping("/members/{memberId}")
-    public Response<Page<PostDto>> getPosts(@PathVariable Long memberId, Pageable pageable) {
-        return Response.success(postReadService.getPosts(memberId, pageable), OK);
+    @GetMapping("/members")
+    public Response<Page<PostDto>> getPosts(@AuthenticationPrincipal MemberDetail member, Pageable pageable) {
+        return Response.success(postReadService.getPosts(member.getMember().getId(), pageable), OK);
     }
 
-    @GetMapping("/members/{memberId}/cursor")
-    public Response<PageCursor<PostDto>> getPostsByCursor(@PathVariable Long memberId, CursorRequest cursorRequest) {
-        return Response.success(postReadService.getPosts(memberId, cursorRequest), OK);
+    @GetMapping("/members/cursor")
+    public Response<PageCursor<PostDto>> getPostsByCursor(@AuthenticationPrincipal MemberDetail member, CursorRequest cursorRequest) {
+        return Response.success(postReadService.getPosts(member.getMember().getId(), cursorRequest), OK);
     }
 
-    @GetMapping("/members/{memberId}/timeline")
-    public Response<PageCursor<PostDto>> getTimeline(@PathVariable Long memberId, CursorRequest cursorRequest) {
-        return Response.success(getTimelinePostUseCase.executeByTimeline(memberId, cursorRequest), OK);
+    @GetMapping("/members/timeline")
+    public Response<PageCursor<PostDto>> getTimeline(@AuthenticationPrincipal MemberDetail member, CursorRequest cursorRequest) {
+        return Response.success(getTimelinePostUseCase.executeByTimeline(member.getMember().getId(), cursorRequest), OK);
     }
 
     @GetMapping("/{postId}")
@@ -71,9 +79,10 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/like/v2")
-    public Response<Void> likePostV2(@PathVariable Long postId,
-                           @RequestParam Long memberId) {
-        postLikeUseCase.execute(postId,  memberId);
+    public Response<Void> likePostV2(@AuthenticationPrincipal MemberDetail member,
+                                     @PathVariable Long postId) {
+        postLikeUseCase.execute(member.getMember().getId(), postId);
         return Response.success(OK);
     }
+
 }

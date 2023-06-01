@@ -108,7 +108,7 @@ public class PostReadService {
                 .id(post.getId())
                 .memberId(post.getMemberId())
                 .contents(post.getContents())
-                .likeCount(postLikeRepository.count(post.getId()))
+                .likeCount(postLikeRepository.countByPostId(post.getId()))
                 .createdAt(post.getCreatedAt())
                 .createdDate(post.getCreatedDate())
                 .build();
