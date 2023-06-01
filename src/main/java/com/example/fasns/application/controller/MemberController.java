@@ -3,17 +3,21 @@ package com.example.fasns.application.controller;
 import com.example.fasns.domain.member.dto.*;
 import com.example.fasns.domain.member.service.MemberReadService;
 import com.example.fasns.domain.member.service.MemberWriteService;
+import com.example.fasns.global.security.MemberDetail;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
+@Slf4j
 public class MemberController {
 
     private final MemberWriteService memberWriteService;
@@ -40,24 +44,24 @@ public class MemberController {
     }
 
     @GetMapping("")
-    public Response<MemberDto> getMember(Authentication authentication) {
-        return Response.success(memberReadService.getMember(authentication.getName()), OK);
+    public Response<MemberDto> getMember(@AuthenticationPrincipal MemberDetail member) {
+        return Response.success(memberReadService.getMember(member.getUsername()), OK);
     }
 
     @GetMapping("/nickname-histories")
-    public Response<List<MemberNicknameHistoryDto>> getNicknameHistories(Authentication authentication) {
-        return Response.success(memberReadService.getNicknameHistories(authentication.getName()), OK);
+    public Response<List<MemberNicknameHistoryDto>> getNicknameHistories(@AuthenticationPrincipal MemberDetail member) {
+        return Response.success(memberReadService.getNicknameHistories(member.getUsername()), OK);
     }
 
     @PostMapping("")
-    public Response<MemberDto> changeNickname(Authentication authentication, @RequestBody String nickname) {
-        memberWriteService.changeNickname(authentication.getName(), nickname);
-        return Response.success(memberReadService.getMember(authentication.getName()), OK);
+    public Response<MemberDto> changeNickname(@AuthenticationPrincipal MemberDetail member, @RequestBody String nickname) {
+        memberWriteService.changeNickname(member.getUsername(), nickname);
+        return Response.success(memberReadService.getMember(member.getUsername()), OK);
     }
 
     @DeleteMapping("")
-    public Response<Void> delete(Authentication authentication) {
-        memberWriteService.delete(authentication.getName());
+    public Response<Void> delete(@AuthenticationPrincipal MemberDetail member) {
+        memberWriteService.delete(member.getUsername());
         return Response.success(OK);
     }
 }

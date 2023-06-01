@@ -1,7 +1,7 @@
 package com.example.fasns.domain.member.service;
 
-import com.example.fasns.common.ErrorCode;
-import com.example.fasns.common.SystemException;
+import com.example.fasns.global.exception.ErrorCode;
+import com.example.fasns.global.exception.SystemException;
 import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.dto.MemberRegisterDto;
 import com.example.fasns.domain.member.entity.Member;
@@ -55,12 +55,6 @@ public class MemberWriteService {
         Member member = validateMember(email);
         memberRepository.delete(member);
         memberNicknameHistoryRepository.delete(member.getId());
-    }
-
-    private Member validateMember(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() ->
-                new SystemException(String.format("%s %s", memberId, ErrorCode.USER_NOT_FOUND.getMessage()),
-                        ErrorCode.USER_NOT_FOUND));
     }
 
     private Member validateMember(String email) {

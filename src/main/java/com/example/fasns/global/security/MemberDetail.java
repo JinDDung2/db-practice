@@ -1,5 +1,6 @@
-package com.example.fasns.domain.member.entity;
+package com.example.fasns.global.security;
 
+import com.example.fasns.domain.member.entity.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

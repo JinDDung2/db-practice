@@ -1,4 +1,4 @@
-package com.example.fasns.security;
+package com.example.fasns.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

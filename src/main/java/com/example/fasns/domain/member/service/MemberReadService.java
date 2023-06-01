@@ -1,13 +1,13 @@
 package com.example.fasns.domain.member.service;
 
-import com.example.fasns.common.ErrorCode;
-import com.example.fasns.common.SystemException;
+import com.example.fasns.global.exception.ErrorCode;
+import com.example.fasns.global.exception.SystemException;
 import com.example.fasns.domain.member.dto.*;
 import com.example.fasns.domain.member.entity.Member;
 import com.example.fasns.domain.member.entity.MemberNicknameHistory;
 import com.example.fasns.domain.member.repository.MemberNicknameHistoryRepository;
 import com.example.fasns.domain.member.repository.MemberRepository;
-import com.example.fasns.jwt.JwtTokenProvider;
+import com.example.fasns.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.example.fasns.common.ErrorCode.USER_NOT_FOUND;
+import static com.example.fasns.global.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class MemberReadService {
     private final MemberNicknameHistoryRepository memberNicknameHistoryRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public MemberDto getMember(Long id) {
         return toDto(memberRepository.findById(id).orElseThrow());

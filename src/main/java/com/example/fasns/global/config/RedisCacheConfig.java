@@ -1,4 +1,4 @@
-package com.example.fasns.config;
+package com.example.fasns.global.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;

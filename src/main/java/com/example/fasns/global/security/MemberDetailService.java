@@ -1,9 +1,8 @@
-package com.example.fasns.domain.member.service;
+package com.example.fasns.global.security;
 
-import com.example.fasns.common.ErrorCode;
-import com.example.fasns.common.SystemException;
+import com.example.fasns.global.exception.ErrorCode;
+import com.example.fasns.global.exception.SystemException;
 import com.example.fasns.domain.member.entity.Member;
-import com.example.fasns.domain.member.entity.MemberDetail;
 import com.example.fasns.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

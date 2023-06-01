@@ -1,4 +1,4 @@
-package com.example.fasns.common;
+package com.example.fasns.global.exception;
 
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-package com.example.fasns.common;
+package com.example.fasns.global.exception;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;

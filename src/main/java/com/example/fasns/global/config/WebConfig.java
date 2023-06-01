@@ -1,7 +1,7 @@
-package com.example.fasns.security;
+package com.example.fasns.global.config;
 
-import com.example.fasns.jwt.JwtAuthenticationFilter;
-import com.example.fasns.jwt.JwtTokenProvider;
+import com.example.fasns.global.jwt.JwtAuthenticationFilter;
+import com.example.fasns.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +30,7 @@ public class WebConfig {
             "/api/members/**"
     };
 
-    private final String[] POST_PERMMIT = {
+    private final String[] POST_PERMIT = {
             "/api/posts/**",
     };
 
@@ -47,7 +47,7 @@ public class WebConfig {
     };
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -60,7 +60,7 @@ public class WebConfig {
                 .authorizeHttpRequests()
                 .antMatchers(SWAGGER).permitAll()
                 .antMatchers(MEMBER_PERMIT).permitAll()
-                .antMatchers(POST_PERMMIT).permitAll()
+                .antMatchers(POST_PERMIT).permitAll()
                 .antMatchers(MEMBER_AUTH).authenticated()
                 .antMatchers(FOLLOW_AUTH).authenticated()
                 .antMatchers(POST_AUTH).authenticated();

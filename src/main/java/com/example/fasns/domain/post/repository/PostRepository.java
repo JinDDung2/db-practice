@@ -1,7 +1,7 @@
 package com.example.fasns.domain.post.repository;
 
-import com.example.fasns.common.ErrorCode;
-import com.example.fasns.common.SystemException;
+import com.example.fasns.global.exception.ErrorCode;
+import com.example.fasns.global.exception.SystemException;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.entity.Post;
@@ -31,9 +31,11 @@ public class PostRepository {
 
     private static final String TABLE = "Post";
 
+    private static final String MEMBER_ID = "memberId";
+
     private static final RowMapper<Post> ROW_MAPPER = ((rs, rowNum) -> Post.builder()
             .id(rs.getLong("id"))
-            .memberId(rs.getLong("memberId"))
+            .memberId(rs.getLong(MEMBER_ID))
             .title(rs.getString("title"))
             .contents(rs.getString("contents"))
             .likeCount(rs.getLong("likeCount"))
@@ -44,7 +46,7 @@ public class PostRepository {
     );
 
     private static final RowMapper<DailyPostCountDto> DAILY_POST_COUNT_DTO_ROW_MAPPER = ((rs, rowNum) -> new DailyPostCountDto(
-            rs.getLong("memberId"),
+            rs.getLong(MEMBER_ID),
             rs.getObject("createdDate", LocalDate.class),
             rs.getLong("count")
     ));
@@ -63,7 +65,6 @@ public class PostRepository {
         String sql = String.format("SELECT * FROM %s WHERE id = :postId", TABLE);
         if (requiredLock) {
             sql += " FOR UPDATE";
-            System.out.println("sql = " + sql);
         }
 
         SqlParameterSource params = new MapSqlParameterSource().addValue("postId", postId);
@@ -81,7 +82,7 @@ public class PostRepository {
                 "OFFSET :offset", TABLE, PageHelper.orderBy(pageable.getSort()));
 
         SqlParameterSource params = new MapSqlParameterSource()
-                .addValue("memberId", memberId)
+                .addValue(MEMBER_ID, memberId)
                 .addValue("size", pageable.getPageSize())
                 .addValue("offset", pageable.getOffset());
 
@@ -93,7 +94,7 @@ public class PostRepository {
     private Long getCount(Long memberId) {
         String sql = String.format("SELECT count(id) FROM %s WHERE memberId = :memberId", TABLE);
 
-        SqlParameterSource params = new MapSqlParameterSource().addValue("memberId", memberId);
+        SqlParameterSource params = new MapSqlParameterSource().addValue(MEMBER_ID, memberId);
 
         return namedParameterJdbcTemplate.queryForObject(sql, params, Long.class);
     }
@@ -119,7 +120,7 @@ public class PostRepository {
                 "LIMIT :size", TABLE);
 
         SqlParameterSource params = new MapSqlParameterSource()
-                .addValue("memberId", memberId)
+                .addValue(MEMBER_ID, memberId)
                 .addValue("size", size);
 
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
@@ -152,7 +153,7 @@ public class PostRepository {
 
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", id)
-                .addValue("memberId", memberId)
+                .addValue(MEMBER_ID, memberId)
                 .addValue("size", size);
 
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
