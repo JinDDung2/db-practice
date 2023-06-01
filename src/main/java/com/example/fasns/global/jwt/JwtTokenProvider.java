@@ -1,7 +1,6 @@
 package com.example.fasns.global.jwt;
 
 import com.example.fasns.domain.member.dto.TokenInfo;
-import com.example.fasns.global.exception.RedisDao;
 import com.example.fasns.global.security.MemberDetailService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
