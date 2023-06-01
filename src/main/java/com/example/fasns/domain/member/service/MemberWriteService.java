@@ -1,17 +1,18 @@
 package com.example.fasns.domain.member.service;
 
-import com.example.fasns.global.exception.ErrorCode;
-import com.example.fasns.global.exception.SystemException;
 import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.dto.MemberRegisterDto;
 import com.example.fasns.domain.member.entity.Member;
 import com.example.fasns.domain.member.entity.MemberNicknameHistory;
 import com.example.fasns.domain.member.repository.MemberNicknameHistoryRepository;
 import com.example.fasns.domain.member.repository.MemberRepository;
+import com.example.fasns.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.example.fasns.global.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,13 @@ public class MemberWriteService {
     }
 
     @Transactional
+    public void changePassword(String email, String password) {
+        Member member = validateMember(email);
+        member.changePassword(passwordEncoder, password);
+        memberRepository.save(member);
+    }
+
+    @Transactional
     public void delete(String email) {
         Member member = validateMember(email);
         memberRepository.delete(member);
@@ -59,8 +67,8 @@ public class MemberWriteService {
 
     private Member validateMember(String email) {
         return memberRepository.findByEmail(email).orElseThrow(() ->
-                new SystemException(String.format("%s %s", email, ErrorCode.USER_NOT_FOUND.getMessage()),
-                        ErrorCode.USER_NOT_FOUND));
+                new SystemException(String.format("%s %s", email, USER_NOT_FOUND.getMessage()),
+                        USER_NOT_FOUND));
     }
 
     private void saveNicknameHistory(Member member) {

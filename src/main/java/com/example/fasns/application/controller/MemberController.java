@@ -53,10 +53,16 @@ public class MemberController {
         return Response.success(memberReadService.getNicknameHistories(member.getUsername()), OK);
     }
 
-    @PostMapping("")
+    @PostMapping("/change/nickname")
     public Response<MemberDto> changeNickname(@AuthenticationPrincipal MemberDetail member, @RequestBody String nickname) {
         memberWriteService.changeNickname(member.getUsername(), nickname);
         return Response.success(memberReadService.getMember(member.getUsername()), OK);
+    }
+
+    @PostMapping("/change/password")
+    Response<Void> changePassword(@AuthenticationPrincipal MemberDetail member, @RequestBody String password) {
+        memberWriteService.changePassword(member.getUsername(), password);
+        return Response.success(OK);
     }
 
     @DeleteMapping("")

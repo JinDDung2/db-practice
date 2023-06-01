@@ -1,7 +1,10 @@
 package com.example.fasns.domain.member.entity;
 
+import com.example.fasns.global.exception.ErrorCode;
+import com.example.fasns.global.exception.SystemException;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
 import java.time.LocalDate;
@@ -16,7 +19,7 @@ public class Member {
 
     private final String email;
 
-    private final String password;
+    private String password;
 
     private final LocalDate birth;
 
@@ -42,6 +45,13 @@ public class Member {
         // 10글자 초과하면 안됨
         validateNickname(nickname);
         this.nickname = nickname;
+    }
+
+    public void changePassword(PasswordEncoder encoder, String password) {
+        if (encoder.matches(password, this.password)) {
+            throw new SystemException(ErrorCode.PASSWORD_IS_SAME_BEFORE_PASSWORD);
+        }
+        this.password = encoder.encode(password);
     }
 
     public void validateNickname(String nickname) {
