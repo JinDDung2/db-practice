@@ -1,11 +1,12 @@
 package com.example.fasns.domain.post.repository;
 
-import com.example.fasns.global.exception.ErrorCode;
-import com.example.fasns.global.exception.SystemException;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
 import com.example.fasns.domain.post.entity.Post;
+import com.example.fasns.global.exception.ErrorCode;
+import com.example.fasns.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -68,8 +69,12 @@ public class PostRepository {
 
         SqlParameterSource params = new MapSqlParameterSource().addValue("postId", postId);
 
-        Post post = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
-        return Optional.ofNullable(post);
+        try {
+            Post post = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
+            return Optional.ofNullable(post);
+        } catch (EmptyResultDataAccessException e) {
+            throw new SystemException(ErrorCode.POST_NOT_FOUND);
+        }
     }
 
     public Page<Post> findAllByMemberId(Long memberId, Pageable pageable) {
@@ -181,6 +186,12 @@ public class PostRepository {
             return insert(post);
         }
         return update(post);
+    }
+
+    public void deleteById(Long id) {
+        String sql = String.format("DELETE FROM %s WHERE id = :id", TABLE);
+        SqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
+        namedParameterJdbcTemplate.update(sql, params);
     }
 
     public void bulkInsert(List<Post> posts) {

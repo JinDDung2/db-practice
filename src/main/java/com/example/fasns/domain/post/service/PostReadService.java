@@ -6,7 +6,6 @@ import com.example.fasns.domain.post.dto.PostDto;
 import com.example.fasns.domain.post.entity.Post;
 import com.example.fasns.domain.post.repository.PostLikeRepository;
 import com.example.fasns.domain.post.repository.PostRepository;
-import com.example.fasns.global.exception.ErrorCode;
 import com.example.fasns.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +17,8 @@ import utils.PageCursor;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.example.fasns.global.exception.ErrorCode.POST_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -33,20 +34,29 @@ public class PostReadService {
         where memberId = :memberId and createdDate between firstDate and lastDate
         group by createdDate, memberId
          */
-        return postRepository.groupByCreatedDate(request);
+        List<DailyPostCountDto> dailyPostCountList = postRepository.groupByCreatedDate(request);
+
+        if (dailyPostCountList.isEmpty()) {
+            throw new SystemException(POST_NOT_FOUND);
+        }
+        return dailyPostCountList;
     }
 
     @Cacheable(cacheNames = "post", key = "#postId")
     public PostDto getPost(Long postId) {
         return toDto(postRepository.findById(postId, false).orElseThrow(() ->
-                new SystemException(ErrorCode.POST_NOT_FOUND)));
+                new SystemException(POST_NOT_FOUND)));
     }
 
     public Page<PostDto> getPosts(Long memberId, Pageable pageable) {
-        return postRepository.findAllByMemberId(memberId, pageable).map(this::toDto);
+        Page<Post> postPages = postRepository.findAllByMemberId(memberId, pageable);
+        if (postPages.isEmpty()) {
+            throw new SystemException(POST_NOT_FOUND);
+        }
+        return postPages.map(this::toDto);
     }
 
-    @Cacheable(cacheNames = "feed", key = "#postId")
+    @Cacheable(cacheNames = "feed", key = "#memberId")
     public PageCursor<PostDto> getPosts(Long memberId, CursorRequest request) {
         /*
         SELECT *
@@ -67,7 +77,7 @@ public class PostReadService {
         FROM POST
         WHERE memberId = :memberId and id > key // 단 key IS NULL 경우도 생각(맨처음)
          */
-        List<PostDto> posts = findAll(memberIds , request).stream()
+        List<PostDto> posts = findAll(memberIds, request).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
         long nextKey = getNextKey(posts);
@@ -76,9 +86,15 @@ public class PostReadService {
     }
 
     public List<PostDto> getPosts(List<Long> ids) {
-        return postRepository.findAllByInId(ids).stream()
+        List<PostDto> postList = postRepository.findAllByInId(ids).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+
+        if (postList.isEmpty()) {
+            throw new SystemException(POST_NOT_FOUND);
+        }
+
+        return postList;
     }
 
     private long getNextKey(List<PostDto> posts) {
@@ -92,15 +108,24 @@ public class PostReadService {
             return postRepository.findAllByLessThanIdAndMemberIdInAndOrderByIdDesc(request.getKey(), memberId, request.getSize());
         }
 
-        return postRepository.findAllByMemberIdInAndOrderByIdDesc(memberId, request.getSize());
+        List<Post> postList = postRepository.findAllByMemberIdInAndOrderByIdDesc(memberId, request.getSize());
+        if (postList.isEmpty()) {
+            throw new SystemException(POST_NOT_FOUND);
+        }
+
+        return postList;
     }
 
     private List<Post> findAll(List<Long> memberIds, CursorRequest request) {
-        if (request.hasKey()) {
+        if (request.hasKey())
             return postRepository.findAllByLessThanIdAndMemberIdInAndOrderByIdDesc(request.getKey(), memberIds, request.getSize());
+
+        List<Post> postList = postRepository.findAllByMemberIdInAndOrderByIdDesc(memberIds, request.getSize());
+        if (postList.isEmpty()) {
+            throw new SystemException(POST_NOT_FOUND);
         }
 
-        return postRepository.findAllByMemberIdInAndOrderByIdDesc(memberIds, request.getSize());
+        return postList;
     }
 
     private PostDto toDto(Post post) {

@@ -2,6 +2,7 @@ package com.example.fasns.application.controller;
 
 import com.example.fasns.application.usecase.CreatePostLikeUseCase;
 import com.example.fasns.application.usecase.CreatePostUseCase;
+import com.example.fasns.application.usecase.DeletePostTimelineUseCase;
 import com.example.fasns.application.usecase.GetTimelinePostUseCase;
 import com.example.fasns.domain.post.dto.DailyPostCountDto;
 import com.example.fasns.domain.post.dto.DailyPostCountRequest;
@@ -30,6 +31,7 @@ public class PostController {
     private final PostReadService postReadService;
     private final PostWriteService postWriteService;
     private final GetTimelinePostUseCase getTimelinePostUseCase;
+    private final DeletePostTimelineUseCase deletePostTimelineUseCase;
     private final CreatePostUseCase createPostUseCase;
     private final CreatePostLikeUseCase postLikeUseCase;
 
@@ -44,6 +46,13 @@ public class PostController {
                                            @PathVariable Long postId,
                                            @RequestBody String content) {
         postWriteService.update(member.getMember().getId(), postId, content);
+        return Response.success(OK);
+    }
+
+    @DeleteMapping("/{postId}")
+    public Response<Void> deleteContent(@AuthenticationPrincipal MemberDetail member,
+                                        @PathVariable Long postId) {
+        deletePostTimelineUseCase.execute(member.getMember().getId(), postId);
         return Response.success(OK);
     }
 

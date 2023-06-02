@@ -38,12 +38,20 @@ public class PostWriteService {
         postRepository.save(post);
     }
 
+    public void delete(Long memberId, Long postId) {
+        Post post = validatePostById(postId, false);
+        if (!post.getMemberId().equals(memberId)) {
+            throw new SystemException(NOT_PERMISSION_FOR_CORRESPONDING_POST);
+        }
+        postRepository.deleteById(postId);
+    }
     /*
      * 동시성 발생하기 좋은 구간
      * 1. 조회하고
      * 2. 연산이 일어나고 (=변경하고)
      * 3. 저장한다.
      */
+
     @Transactional
     public void likePost(Long postId) {
         // 비관적 락은 트랜잭션도 걸어줘야하고, requiredLock도 걸어줘야함

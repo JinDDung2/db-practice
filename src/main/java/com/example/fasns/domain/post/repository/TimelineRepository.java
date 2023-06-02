@@ -21,9 +21,11 @@ public class TimelineRepository {
 
     private static final String TABLE = "Timeline";
 
+    private static final String MEMBER_ID = "memberId";
+
     private static final RowMapper<Timeline> ROW_MAPPER = ((rs, rowNum) -> Timeline.builder()
             .id(rs.getLong("id"))
-            .memberId(rs.getLong("memberId"))
+            .memberId(rs.getLong(MEMBER_ID))
             .postId(rs.getLong("postId"))
             .createdAt(rs.getObject("createdAt", LocalDateTime.class))
             .build()
@@ -37,7 +39,7 @@ public class TimelineRepository {
                 "LIMIT :size", TABLE);
 
         SqlParameterSource params = new MapSqlParameterSource()
-                .addValue("memberId", memberId)
+                .addValue(MEMBER_ID, memberId)
                 .addValue("size", size);
 
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
@@ -52,7 +54,7 @@ public class TimelineRepository {
 
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", id)
-                .addValue("memberId", memberId)
+                .addValue(MEMBER_ID, memberId)
                 .addValue("size", size);
 
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
@@ -89,5 +91,12 @@ public class TimelineRepository {
                 .postId(timeline.getPostId())
                 .createdAt(timeline.getCreatedAt())
                 .build();
+    }
+
+    public void deleteByPostId(Long postId) {
+        String sql = String.format("DELETE FROM %s WHERE postId = :postId", TABLE);
+        SqlParameterSource params = new MapSqlParameterSource().addValue("postId", postId);
+
+        namedParameterJdbcTemplate.update(sql, params);
     }
 }
