@@ -1,7 +1,10 @@
 package com.example.fasns.domain.member.repository;
 
 import com.example.fasns.domain.member.entity.Member;
+import com.example.fasns.global.exception.ErrorCode;
+import com.example.fasns.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -38,8 +41,12 @@ public class MemberRepository {
         MapSqlParameterSource param = new MapSqlParameterSource()
                 .addValue("email", email);
 
-        Member member = namedParameterJdbcTemplate.queryForObject(sql, param, ROW_MAPPER);
-        return Optional.ofNullable(member);
+        try {
+            Member member = namedParameterJdbcTemplate.queryForObject(sql, param, ROW_MAPPER);
+            return Optional.ofNullable(member);
+        } catch (EmptyResultDataAccessException e) {
+            throw new SystemException(ErrorCode.USER_NOT_FOUND);
+        }
     }
 
     public Optional<Member> findById(Long id) {
@@ -47,8 +54,12 @@ public class MemberRepository {
         MapSqlParameterSource param = new MapSqlParameterSource()
                 .addValue("id", id);
 
-        Member member = namedParameterJdbcTemplate.queryForObject(sql, param, ROW_MAPPER);
-        return Optional.ofNullable(member);
+        try {
+            Member member = namedParameterJdbcTemplate.queryForObject(sql, param, ROW_MAPPER);
+            return Optional.ofNullable(member);
+        } catch (EmptyResultDataAccessException e) {
+            throw new SystemException(ErrorCode.USER_NOT_FOUND);
+        }
     }
 
     public List<Member> findAllByIdIn(List<Long> ids) {
