@@ -38,7 +38,6 @@ create table Post
 (
     id int auto_increment,
     memberId int not null,
-    title varchar(500) not null,
     contents varchar(1000) not null,
     createdDate date not null,
     createdAt datetime not null,
