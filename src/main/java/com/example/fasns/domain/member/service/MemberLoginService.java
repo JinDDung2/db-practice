@@ -27,7 +27,7 @@ public class MemberLoginService {
     private final MemberRepository memberRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public TokenInfo login(MemberLoginDto loginDto) {
         validateMember(loginDto.getEmail());
@@ -59,7 +59,7 @@ public class MemberLoginService {
         Authentication authentication = jwtTokenProvider.getAuthentication(tokenDto.getAccessToken());
 
         // 3. Redis 에서 User email 을 기반으로 저장된 Refresh Token 값을 가져옵니다.
-        String refreshToken = redisTemplate.opsForValue().get("RT:" + authentication.getName());
+        String refreshToken = (String) redisTemplate.opsForValue().get("RT:" + authentication.getName());
         // (추가) 로그아웃되어 Redis 에 RefreshToken 이 존재하지 않는 경우 처리
         if(ObjectUtils.isEmpty(refreshToken) || !refreshToken.equals(tokenDto.getRefreshToken())) {
             throw new SystemException(ErrorCode.INVALID_TOKEN);
