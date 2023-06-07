@@ -1,6 +1,7 @@
 package com.example.fasns.application.controller;
 
 import com.example.fasns.domain.member.dto.*;
+import com.example.fasns.domain.member.service.MemberLoginService;
 import com.example.fasns.domain.member.service.MemberReadService;
 import com.example.fasns.domain.member.service.MemberWriteService;
 import com.example.fasns.global.security.MemberDetail;
@@ -22,6 +23,7 @@ public class MemberController {
 
     private final MemberWriteService memberWriteService;
     private final MemberReadService memberReadService;
+    private final MemberLoginService memberLoginService;
 
     @PostMapping("/register")
     public Response<MemberDto> register(@RequestBody MemberRegisterDto registerDto) {
@@ -30,17 +32,18 @@ public class MemberController {
 
     @PostMapping("/login")
     public Response<TokenInfo> login(@RequestBody MemberLoginDto loginDto) {
-        return Response.success(memberReadService.login(loginDto), OK);
+        return Response.success(memberLoginService.login(loginDto), OK);
     }
 
     @PostMapping("/reissue")
     public Response<TokenDto> reissue(@RequestBody TokenDto tokenDto) {
-        return Response.success(memberReadService.reissue(tokenDto), OK);
+        return Response.success(memberLoginService.reissue(tokenDto), OK);
     }
 
     @PostMapping("/logout")
-    public Response<TokenDto> logout(@RequestBody TokenDto tokenDto) {
-        return Response.success(memberReadService.logout(tokenDto), OK);
+    public Response<Void> logout(@RequestBody TokenDto tokenDto) {
+        memberLoginService.logout(tokenDto);
+        return Response.success(OK);
     }
 
     @GetMapping("")
