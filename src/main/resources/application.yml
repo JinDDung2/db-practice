@@ -7,6 +7,16 @@ spring:
       auth:
         host: ${spring.data.redis.auth.host}
         port: ${spring.data.redis.auth.port}
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${google.client.id}
+            client-secret: ${google.client.secret}
+
+  profiles:
+    include: oauth
 
 
   datasource:
@@ -21,3 +31,19 @@ spring:
 # jwt
 jwt:
   secret: ${jwt.secret}
+
+# google login
+#google:
+#  auth:
+#    url: https://oauth2.googleapis.com
+#    scope: profile,
+#  login:
+#    url: https://accounts.google.com
+#  redirect:
+#    url: http://localhost:8080/api/members/login/redirect
+#  client:
+#    id: ${google.client.id}
+#    secret: ${google.client.secret}
+
+
+
