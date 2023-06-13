@@ -2,6 +2,7 @@ package com.example.fasns.global.config;
 
 import com.example.fasns.global.jwt.JwtAuthenticationFilter;
 import com.example.fasns.global.jwt.JwtTokenProvider;
+import com.example.fasns.global.oauth.service.OAuthLoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +49,7 @@ public class WebConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final OAuthLoginService oAuthLoginService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -57,6 +59,13 @@ public class WebConfig {
                 .cors();
 
         httpSecurity
+                .oauth2Login() //OAuth 2.0 기반 인증을 처리하기위해 Provider와의 연동을 지원
+//                .defaultSuccessUrl("/oauth/loginInfo", true)
+                .userInfoEndpoint()  //OAuth 2.0 Provider로부터 사용자 정보를 가져오는 엔드포인트를 지정하는 메서드
+                .userService(oAuthLoginService); //OAuth 2.0 인증이 처리되는데 사용될 사용자 서비스를 지정하는 메서드
+
+        //== URL별 권한 관리 옵션 ==//
+        httpSecurity
                 .authorizeHttpRequests()
                 .antMatchers(SWAGGER).permitAll()
                 .antMatchers(MEMBER_PERMIT).permitAll()
@@ -65,6 +74,15 @@ public class WebConfig {
                 .antMatchers(FOLLOW_AUTH).authenticated()
                 .antMatchers(POST_AUTH).authenticated();
 
+        // 아이콘, css, js 관련
+        // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능
+        httpSecurity
+                .authorizeHttpRequests()
+                .antMatchers("/","/css/**","/images/**","/js/**","/favicon.ico","/h2-console/**").permitAll()
+                .antMatchers("/sign-up").permitAll() // 회원가입 접근 가능
+                .anyRequest().authenticated(); // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+
+        //세션을 생성하지 않고, 요청마다 새로운 인증을 수행하도록 구성하는 옵션으로 REST API와 같은 환경에서 사용
         httpSecurity
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

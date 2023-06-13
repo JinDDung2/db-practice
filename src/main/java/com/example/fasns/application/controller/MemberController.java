@@ -35,6 +35,11 @@ public class MemberController {
         return Response.success(memberLoginService.login(loginDto), OK);
     }
 
+//    @GetMapping("/oauth2/google")
+//    public void getGoogleAuthUrl(HttpServletResponse response) throws Exception{
+//        response.sendRedirect();
+//    }
+
     @PostMapping("/reissue")
     public Response<TokenDto> reissue(@RequestBody TokenDto tokenDto) {
         return Response.success(memberLoginService.reissue(tokenDto), OK);

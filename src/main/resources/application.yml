@@ -14,6 +14,9 @@ spring:
           google:
             client-id: ${google.client.id}
             client-secret: ${google.client.secret}
+            scope:
+              - profile
+              - email
 
   profiles:
     include: oauth
