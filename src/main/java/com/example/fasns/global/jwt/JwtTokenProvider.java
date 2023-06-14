@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.time.Duration;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -64,8 +63,8 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        // Reids에 refresh Token 넣기
-        redisDao.setValues(authentication.getName(), refreshToken, Duration.ofMillis(REFRESH_TOKEN_EXPIRE_TIME));
+//        // Reids에 refresh Token 넣기
+//        redisDao.setValues(authentication.getName(), refreshToken, Duration.ofMillis(REFRESH_TOKEN_EXPIRE_TIME));
 
         return TokenInfo.builder()
                 .grantType(BEARER_TYPE)

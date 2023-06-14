@@ -2,7 +2,9 @@ package com.example.fasns.global.config;
 
 import com.example.fasns.global.jwt.JwtAuthenticationFilter;
 import com.example.fasns.global.jwt.JwtTokenProvider;
-import com.example.fasns.global.oauth.service.OAuthLoginService;
+import com.example.fasns.global.oauth.handler.OAuth2LoginFailureHandler;
+import com.example.fasns.global.oauth.handler.OAuth2LoginSuccessHandler;
+import com.example.fasns.global.oauth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +13,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -18,7 +22,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebConfig {
 
-    private final String SWAGGER = "/swagger-ui/**";
+    private final String[] SWAGGER = {
+            "/swagger-ui/**",
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**"
+    };
 
     private final String[] MEMBER_PERMIT = {
             "/api/members/register",
@@ -49,7 +60,9 @@ public class WebConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final OAuthLoginService oAuthLoginService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+//    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+//    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -58,11 +71,10 @@ public class WebConfig {
                 .csrf().disable()
                 .cors();
 
+        //세션을 생성하지 않고, 요청마다 새로운 인증을 수행하도록 구성하는 옵션으로 REST API와 같은 환경에서 사용
         httpSecurity
-                .oauth2Login() //OAuth 2.0 기반 인증을 처리하기위해 Provider와의 연동을 지원
-//                .defaultSuccessUrl("/oauth/loginInfo", true)
-                .userInfoEndpoint()  //OAuth 2.0 Provider로부터 사용자 정보를 가져오는 엔드포인트를 지정하는 메서드
-                .userService(oAuthLoginService); //OAuth 2.0 인증이 처리되는데 사용될 사용자 서비스를 지정하는 메서드
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         //== URL별 권한 관리 옵션 ==//
         httpSecurity
@@ -82,14 +94,26 @@ public class WebConfig {
                 .antMatchers("/sign-up").permitAll() // 회원가입 접근 가능
                 .anyRequest().authenticated(); // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
 
-        //세션을 생성하지 않고, 요청마다 새로운 인증을 수행하도록 구성하는 옵션으로 REST API와 같은 환경에서 사용
         httpSecurity
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .oauth2Login() //OAuth 2.0 기반 인증을 처리하기위해 Provider와의 연동을 지원
+                .successHandler(oAuth2LoginSuccessHandler()) // 동의하고 계속하기를 눌렀을 때 Handler 설정
+                .failureHandler(oAuth2LoginFailureHandler()) // 소셜 로그인 실패 시 핸들러 설정
+                .userInfoEndpoint()  //OAuth 2.0 Provider로부터 사용자 정보를 가져오는 엔드포인트를 지정하는 메서드
+                .userService(customOAuth2UserService); //OAuth 2.0 인증이 처리되는데 사용될 사용자 서비스를 지정하는 메서드
 
         httpSecurity
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler oAuth2LoginSuccessHandler() {
+        return new OAuth2LoginSuccessHandler(jwtTokenProvider, redisTemplate);
+    }
+
+    @Bean
+    public AuthenticationFailureHandler oAuth2LoginFailureHandler() {
+        return new OAuth2LoginFailureHandler();
     }
 }

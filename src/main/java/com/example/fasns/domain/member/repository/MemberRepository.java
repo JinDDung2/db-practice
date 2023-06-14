@@ -1,8 +1,6 @@
 package com.example.fasns.domain.member.repository;
 
 import com.example.fasns.domain.member.entity.Member;
-import com.example.fasns.global.exception.ErrorCode;
-import com.example.fasns.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
@@ -45,7 +43,7 @@ public class MemberRepository {
             Member member = namedParameterJdbcTemplate.queryForObject(sql, param, ROW_MAPPER);
             return Optional.ofNullable(member);
         } catch (EmptyResultDataAccessException e) {
-            throw new SystemException(ErrorCode.USER_NOT_FOUND);
+            return Optional.empty();
         }
     }
 
@@ -58,7 +56,7 @@ public class MemberRepository {
             Member member = namedParameterJdbcTemplate.queryForObject(sql, param, ROW_MAPPER);
             return Optional.ofNullable(member);
         } catch (EmptyResultDataAccessException e) {
-            throw new SystemException(ErrorCode.USER_NOT_FOUND);
+            return Optional.empty();
         }
     }
 

@@ -2,7 +2,7 @@ package com.example.fasns.global.oauth;
 
 import java.util.Map;
 
-public abstract class OAuth2UserInfo {
+public abstract class OAuth2UserInfo{
 
     protected Map<String, Object> attributes;
 

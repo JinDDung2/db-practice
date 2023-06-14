@@ -2,8 +2,8 @@ package com.example.fasns.global.oauth.service;
 
 import com.example.fasns.domain.member.entity.Member;
 import com.example.fasns.domain.member.repository.MemberRepository;
-import com.example.fasns.global.oauth.CustomOAuth2User;
 import com.example.fasns.global.oauth.OAuthAttributes;
+import com.example.fasns.global.oauth.SocialType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,9 +11,11 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -22,10 +24,12 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class OAuthLoginService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private static final String NAVER = "naver";
+    private static final String KAKAO = "kakao";
 
 
     /**
@@ -46,6 +50,7 @@ public class OAuthLoginService implements OAuth2UserService<OAuth2UserRequest, O
          */
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         // OAuth 서비스 이름(ex. kakao, naver, google)
+        SocialType socialType = getSocialType(registrationId);
         // OAuth2 로그인 시 키(PK)가 되는 값
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails()
@@ -54,15 +59,14 @@ public class OAuthLoginService implements OAuth2UserService<OAuth2UserRequest, O
 
         // 소셜 로그인에서 API가 제공하는 userInfo의 Json 값(유저 정보들)
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        OAuthAttributes extractAttributes = OAuthAttributes.of(userNameAttributeName, attributes);
+        OAuthAttributes extractAttributes = OAuthAttributes.of(socialType, userNameAttributeName, attributes);
 
-        Member member = saveOrUpdate(extractAttributes);
+        saveOrUpdate(extractAttributes);
 
-        return new CustomOAuth2User(
+        return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 attributes,
-                extractAttributes.getNameAttributeKey(),
-                member.getEmail()
+                extractAttributes.getNameAttributeKey()
         );
     }
 
@@ -75,6 +79,7 @@ public class OAuthLoginService implements OAuth2UserService<OAuth2UserRequest, O
                     .nickname(attributes.getOauth2UserInfo().getNickname())
                     .email(attributes.getOauth2UserInfo().getEmail())
                     .password(passwordEncoder.encode(password))
+                    .birth(LocalDate.now())
                     .build();
             return memberRepository.save(member);
         }
@@ -82,5 +87,17 @@ public class OAuthLoginService implements OAuth2UserService<OAuth2UserRequest, O
             return optionalMember.get();
         }
 
+    }
+
+    private SocialType getSocialType(String registrationId) {
+        if (NAVER.equals(registrationId)) {
+            return SocialType.NAVER;
+        }
+
+        if (KAKAO.equals(registrationId)) {
+            return SocialType.KAKAO;
+        }
+
+        return SocialType.GOOGLE;
     }
 }
