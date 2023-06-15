@@ -25,6 +25,6 @@ Java, Spring Boot, IntelliJ, Gradle, MySQL, Redis, Docker, EC2
 ### ✅ [Use Case](https://github.com/JinDDung2/sns-practice/wiki/Use-Case)
 
 ### ✅ [ERD](https://github.com/JinDDung2/sns-practice/wiki/ERD)
-
+![img.png](assets/ERD.png)
 
 ### ✅ 프로젝트를 진행하며 고민한 [Technical Issue](https://github.com/JinDDung2/sns-practice/wiki/Technical-Issue)
