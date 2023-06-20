@@ -25,6 +25,8 @@ public enum ErrorCode {
     DUPLICATED_EMAIL("중복된 이메일 입니다.", CONFLICT),
     PASSWORD_NOT_MATCHED("비밀번호가 일치하지 않습니다.", BAD_REQUEST),
     PASSWORD_IS_SAME_BEFORE_PASSWORD("이전 비밀번호와 같습니다.", BAD_REQUEST),
+    NOW_ENOUGH_FOLLOWERS("팔로워 수가 충분하지 않습니다.", BAD_REQUEST),
+    NONE_NEXT_ROLE("이 역할은 업그레이드가 불가합니다.", BAD_REQUEST),
 
     // Post Error
     POST_NOT_FOUND("게시글을 찾을 수 없습니다.", BAD_REQUEST),

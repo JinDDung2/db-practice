@@ -35,10 +35,6 @@ public class MemberController {
         return Response.success(memberLoginService.login(loginDto), OK);
     }
 
-//    @GetMapping("/oauth2/google")
-//    public void getGoogleAuthUrl(HttpServletResponse response) throws Exception{
-//        response.sendRedirect();
-//    }
 
     @PostMapping("/reissue")
     public Response<TokenDto> reissue(@RequestBody TokenDto tokenDto) {
@@ -73,6 +69,11 @@ public class MemberController {
         return Response.success(OK);
     }
 
+    @PostMapping("/change/role")
+    Response<Void> changeRole(@AuthenticationPrincipal MemberDetail admin, Long memberId) {
+        memberWriteService.upgradeMemberRole(admin.getMember(), memberId);
+        return Response.success(OK);
+    }
     @DeleteMapping("")
     public Response<Void> delete(@AuthenticationPrincipal MemberDetail member) {
         memberWriteService.delete(member.getUsername());

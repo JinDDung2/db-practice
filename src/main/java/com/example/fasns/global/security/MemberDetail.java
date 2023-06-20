@@ -34,7 +34,7 @@ public class MemberDetail implements UserDetails, OAuth2User {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
         // 역할 목록
-        GrantedAuthority roleAuthority = new SimpleGrantedAuthority("ROLE_USER");
+        GrantedAuthority roleAuthority = new SimpleGrantedAuthority("ROLE_BASIC");
         authorities.add(roleAuthority);
 
         return authorities;

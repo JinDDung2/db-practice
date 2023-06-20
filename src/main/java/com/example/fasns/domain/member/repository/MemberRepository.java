@@ -1,6 +1,7 @@
 package com.example.fasns.domain.member.repository;
 
 import com.example.fasns.domain.member.entity.Member;
+import com.example.fasns.enums.MemberRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
@@ -32,6 +33,9 @@ public class MemberRepository {
             .nickname(rs.getString("nickname"))
             .birth(rs.getObject("birth", LocalDate.class))
             .createdAt(rs.getObject("createdAt", LocalDateTime.class))
+            .memberRole(MemberRole.valueOf(rs.getString("memberRole")))
+            .provider(rs.getString("provider"))
+            .providerId(rs.getString("provider"))
             .build();
 
     public Optional<Member> findByEmail(String email) {
@@ -58,6 +62,13 @@ public class MemberRepository {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    public List<Member> findAll() {
+        String sql = String.format("SELECT * FROM %s", TABLE);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
     }
 
     public List<Member> findAllByIdIn(List<Long> ids) {
@@ -102,8 +113,14 @@ public class MemberRepository {
     }
 
     private Member update(Member member) {
-        String sql = String.format("UPDATE %s set email = :email, nickname = :nickname, birth = :birth WHERE id = :id", TABLE);
-        SqlParameterSource params = new BeanPropertySqlParameterSource(member);
+        String sql = String.format("UPDATE %s set email = :email, nickname = :nickname, password = :password, memberRole = :memberRole, birth = :birth WHERE id = :id", TABLE);
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", member.getId())
+                .addValue("email", member.getEmail())
+                .addValue("nickname", member.getNickname())
+                .addValue("password", member.getPassword())
+                .addValue("memberRole", member.getMemberRole().getName())
+                .addValue("birth", member.getBirth());
         namedParameterJdbcTemplate.update(sql, params);
         return member;
     }

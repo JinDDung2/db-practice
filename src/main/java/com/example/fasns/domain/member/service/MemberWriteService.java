@@ -1,11 +1,14 @@
 package com.example.fasns.domain.member.service;
 
+import com.example.fasns.domain.follow.repository.FollowRepository;
 import com.example.fasns.domain.member.dto.MemberDto;
 import com.example.fasns.domain.member.dto.MemberRegisterDto;
 import com.example.fasns.domain.member.entity.Member;
 import com.example.fasns.domain.member.entity.MemberNicknameHistory;
 import com.example.fasns.domain.member.repository.MemberNicknameHistoryRepository;
 import com.example.fasns.domain.member.repository.MemberRepository;
+import com.example.fasns.enums.MemberRole;
+import com.example.fasns.global.exception.ErrorCode;
 import com.example.fasns.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +23,7 @@ public class MemberWriteService {
 
     private final MemberRepository memberRepository;
     private final MemberNicknameHistoryRepository memberNicknameHistoryRepository;
+    private final FollowRepository followRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -35,6 +39,7 @@ public class MemberWriteService {
                 .birth(registerDto.getBirth())
                 .build();
 
+        member.addMemberRole();
         Member saveMember = memberRepository.save(member);
         saveNicknameHistory(saveMember);
 
@@ -59,6 +64,18 @@ public class MemberWriteService {
     }
 
     @Transactional
+    public void upgradeMemberRole(Member admin, Long memberId) {
+        validateAdmin(admin);
+        Member member = validateMember(memberId);
+        if (followRepository.findAllByToMemberId(memberId).size() >= 3) {
+            member.upgradeRole();
+            memberRepository.save(member);
+        } else {
+            throw new SystemException(ErrorCode.NOW_ENOUGH_FOLLOWERS);
+        }
+    }
+
+    @Transactional
     public void delete(String email) {
         Member member = validateMember(email);
         memberRepository.delete(member);
@@ -69,6 +86,17 @@ public class MemberWriteService {
         return memberRepository.findByEmail(email).orElseThrow(() ->
                 new SystemException(String.format("%s %s", email, USER_NOT_FOUND.getMessage()),
                         USER_NOT_FOUND));
+    }
+
+    private Member validateMember(Long id) {
+        return memberRepository.findById(id).orElseThrow(() ->
+                new SystemException(String.format("%s %s", id, USER_NOT_FOUND.getMessage()),
+                        USER_NOT_FOUND));
+    }
+
+    private boolean validateAdmin(Member member) {
+        if (member.getMemberRole().equals(MemberRole.ROLE_ADMIN)) return true;
+        return false;
     }
 
     private void saveNicknameHistory(Member member) {

@@ -1,5 +1,6 @@
 package com.example.fasns.domain.member.entity;
 
+import com.example.fasns.enums.MemberRole;
 import com.example.fasns.global.exception.ErrorCode;
 import com.example.fasns.global.exception.SystemException;
 import lombok.Builder;
@@ -10,6 +11,8 @@ import org.springframework.util.Assert;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+
+import static com.example.fasns.enums.MemberRole.*;
 
 @Getter
 public class Member {
@@ -25,6 +28,8 @@ public class Member {
 
     private final LocalDateTime createdAt;
 
+    private MemberRole memberRole;
+
     private String provider;    // oauth2를 이용할 경우 어떤 플랫폼을 이용하는지
 
     private String providerId;  // oauth2를 이용할 경우 아이디값
@@ -32,26 +37,18 @@ public class Member {
     private static final Integer MAX_NICKNAME_LENGTH = 10;
 
     @Builder
-    public Member(Long id, String nickname, String email, String password, LocalDate birth, LocalDateTime createdAt) {
+    public Member(Long id, String nickname, String email, String password, LocalDate birth, LocalDateTime createdAt,
+                  MemberRole memberRole, String provider, String providerId) {
         this.id = id;
-
         validateNickname(nickname);
         this.nickname = Objects.requireNonNull(nickname);
         this.password = Objects.requireNonNull(password);
         this.email = Objects.requireNonNull(email);
         this.birth = Objects.requireNonNull(birth);
         this.createdAt = createdAt == null ? LocalDateTime.now() : createdAt;
-    }
-
-    @Builder(builderClassName = "OAuth2Register", builderMethodName = "oauth2Register")
-    public Member(Long id, String password, String email, String provider, String providerId, LocalDate birth, LocalDateTime createdAt) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
+        this.memberRole = memberRole;
         this.provider = provider;
         this.providerId = providerId;
-        this.birth = birth;
-        this.createdAt = createdAt == null ? LocalDateTime.now() : createdAt;
     }
 
     public void changeNickname(String nickname) {
@@ -67,6 +64,18 @@ public class Member {
             throw new SystemException(ErrorCode.PASSWORD_IS_SAME_BEFORE_PASSWORD);
         }
         this.password = encoder.encode(password);
+    }
+
+    public void addMemberRole() {
+        if (this.memberRole == null) this.memberRole = ROLE_BASIC;
+    }
+    public void upgradeRole() {
+        MemberRole nextLevel = this.memberRole.getNextLevel();
+        if (nextLevel == null) {
+            throw new SystemException(ErrorCode.NONE_NEXT_ROLE);
+        } else {
+            this.memberRole = nextLevel;
+        }
     }
 
     public void validateNickname(String nickname) {
