@@ -1,3 +1,7 @@
 ### Get Post 단건 조회;
 GET http://localhost:8080/api/posts/30000
 Content-Type: application/json
+
+### Get Post 단건 조회;
+GET http://localhost:8080/api/posts/30001
+Content-Type: application/json

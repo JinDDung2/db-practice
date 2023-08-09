@@ -39,3 +39,4 @@ out/
 
 ### ignore ###
 /src/main/resources/application-oauth.yml
+/src/main/resources/http/*
